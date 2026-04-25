@@ -102,11 +102,6 @@ export function onSnapshot(queryOrCol, callback) {
 
   store[col] = store[col] || {}
 
-  // Seed some mock drives on first call
-  if (col === 'drives' && Object.keys(store.drives).length === 0) {
-    seedDrives()
-  }
-
   listeners[col] = listeners[col] || []
 
   const handler = (docs) => {
@@ -143,99 +138,7 @@ export function onSnapshot(queryOrCol, callback) {
   }
 }
 
-// ── Seed mock data ──────────────────────────────────────────
-function seedDrives() {
-  const mockDrives = [
-    {
-      title: 'Yamuna River Cleanup',
-      description: 'Cleaning plastic waste from Yamuna riverbank near ITO bridge.',
-      category: 'cleanup',
-      urgency: 'high',
-      location: 'ITO Bridge, Delhi',
-      duration: '4 hours',
-      volunteersJoined: 18,
-      estimatedVolunteers: 30,
-      requiredSkills: ['Waste Management', 'First Aid'],
-      status: 'active',
-      impactScore: 8,
-      ngoId: 'seed_ngo_1',
-      lat: 28.6271,
-      lng: 77.2411,
-    },
-    {
-      title: 'Lodhi Garden Plantation Drive',
-      description: 'Planting 500 native saplings across Lodhi Garden with local volunteers.',
-      category: 'plantation',
-      urgency: 'medium',
-      location: 'Lodhi Garden, Delhi',
-      duration: '3 hours',
-      volunteersJoined: 24,
-      estimatedVolunteers: 40,
-      requiredSkills: ['Gardening', 'Photography'],
-      status: 'active',
-      impactScore: 9,
-      ngoId: 'seed_ngo_1',
-      lat: 28.5931,
-      lng: 77.2197,
-    },
-    {
-      title: 'Plastic-Free Connaught Place',
-      description: 'Awareness campaign and waste collection drive at CP market.',
-      category: 'awareness',
-      urgency: 'low',
-      location: 'Connaught Place, Delhi',
-      duration: '2 hours',
-      volunteersJoined: 9,
-      estimatedVolunteers: 20,
-      requiredSkills: ['Social Media', 'Teaching'],
-      status: 'active',
-      impactScore: 7,
-      ngoId: 'seed_ngo_2',
-      lat: 28.6315,
-      lng: 77.2167,
-    },
-    {
-      title: 'Hauz Khas Lake Restoration',
-      description: 'Water quality testing and debris removal from Hauz Khas lake.',
-      category: 'water_conservation',
-      urgency: 'critical',
-      location: 'Hauz Khas, Delhi',
-      duration: '6 hours',
-      volunteersJoined: 5,
-      estimatedVolunteers: 25,
-      requiredSkills: ['First Aid', 'Driving', 'Data Entry'],
-      status: 'active',
-      impactScore: 9,
-      ngoId: 'seed_ngo_2',
-      lat: 28.5494,
-      lng: 77.2001,
-    },
-    {
-      title: 'E-Waste Collection Camp',
-      description: 'Collecting old electronics for responsible recycling at RK Puram.',
-      category: 'recycling',
-      urgency: 'medium',
-      location: 'RK Puram, Delhi',
-      duration: '5 hours',
-      volunteersJoined: 12,
-      estimatedVolunteers: 15,
-      requiredSkills: ['Driving', 'Data Entry'],
-      status: 'active',
-      impactScore: 7,
-      ngoId: 'seed_ngo_1',
-      lat: 28.5672,
-      lng: 77.1731,
-    },
-  ]
 
-  mockDrives.forEach((d, i) => {
-    const id = makeId()
-    // Add dates: drives start 2, 5, 10, 15, 30 days from now
-    const daysFromNow = [2, 5, 10, 15, 30][i] || 7
-    const driveDate = new Date(Date.now() + daysFromNow * 24 * 60 * 60 * 1000).toISOString()
-    store.drives[id] = { ...d, date: driveDate, createdAt: new Date().toISOString() }
-  })
-}
 
 // Legacy export for any direct firebase imports
 export const auth = {}
