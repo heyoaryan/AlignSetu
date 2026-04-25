@@ -93,10 +93,16 @@ export default function Navbar() {
           )}
         </div>
 
-        <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}
-          style={{ color: 'var(--text-primary)' }}>
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="md:hidden flex items-center gap-2">
+          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={toggle}
+            className="p-2 rounded-lg transition-colors card b-theme">
+            {isDark ? <Sun size={15} className="text-yellow-400" /> : <Moon size={15} className="text-blue-500" />}
+          </motion.button>
+          <button onClick={() => setMenuOpen(!menuOpen)}
+            style={{ color: 'var(--text-primary)' }}>
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
@@ -109,9 +115,22 @@ export default function Navbar() {
               <a key={item} href={`#${item.toLowerCase()}`} className="text-sm hover:text-green-500 transition-colors"
                 style={{ color: 'var(--text-secondary)' }}>{item}</a>
             ))}
-            <Link to="/auth" className="text-sm bg-green-500 text-black font-semibold px-4 py-2 rounded-lg text-center">
-              Get Started
-            </Link>
+            {currentUser ? (
+              <>
+                <Link to={dashboardPath} className="text-sm hover:text-green-500 transition-colors flex items-center gap-2"
+                  style={{ color: 'var(--text-secondary)' }}>
+                  <User size={15} /> Dashboard
+                </Link>
+                <button onClick={handleLogout} className="text-sm text-left hover:text-red-500 transition-colors flex items-center gap-2"
+                  style={{ color: 'var(--text-secondary)' }}>
+                  <LogOut size={15} /> Logout
+                </button>
+              </>
+            ) : (
+              <Link to="/auth" className="text-sm bg-green-500 text-black font-semibold px-4 py-2 rounded-lg text-center">
+                Get Started
+              </Link>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
