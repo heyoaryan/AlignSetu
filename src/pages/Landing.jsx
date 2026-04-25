@@ -4,7 +4,8 @@ import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'fra
 import {
   Leaf, ArrowRight, Sparkles, MapPin, Users, Shield,
   TreePine, Droplets, Wind, Recycle, Globe, ChevronDown,
-  Zap, BarChart3, CheckCircle, Star, TrendingUp, Award, Clock, AlertTriangle
+  Zap, BarChart3, CheckCircle, Star, TrendingUp, Award, Clock, AlertTriangle,
+  Trophy, Camera, MessageSquare
 } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { useTheme } from '../context/ThemeContext'
@@ -63,12 +64,69 @@ const ROTATING_WORDS = [
 ]
 
 const features = [
-  { icon: Sparkles, title: 'Gemini AI Analysis', desc: 'AI converts drive descriptions into structured action plans with urgency scoring and skill matching.', color: 'text-yellow-500', bg: 'bg-yellow-500/10 border-yellow-500/20' },
-  { icon: MapPin, title: 'Google Maps Integration', desc: 'Volunteers discover nearby drives on an interactive map with real-time markers and location data.', color: 'text-blue-500', bg: 'bg-blue-500/10 border-blue-500/20' },
-  { icon: Users, title: 'Smart Volunteer Matching', desc: 'AI matches volunteers to drives based on skills, location, and availability for maximum impact.', color: 'text-purple-500', bg: 'bg-purple-500/10 border-purple-500/20' },
-  { icon: Shield, title: 'NGO Verification', desc: 'Admin panel with AI-powered flagging ensures only legitimate NGOs operate on the platform.', color: 'text-green-500', bg: 'bg-green-500/10 border-green-500/20' },
-  { icon: BarChart3, title: 'Real-time Analytics', desc: 'Live dashboards track environmental impact, volunteer hours, and drive completion rates.', color: 'text-cyan-500', bg: 'bg-cyan-500/10 border-cyan-500/20' },
-  { icon: Recycle, title: 'Multi-category Drives', desc: 'Support for cleanups, plantation, water conservation, wildlife protection, and awareness campaigns.', color: 'text-orange-500', bg: 'bg-orange-500/10 border-orange-500/20' },
+  {
+    icon: Sparkles,
+    title: 'Gemini AI Drive Analysis',
+    desc: 'Paste a drive description — Gemini instantly returns category, urgency score, required skills, volunteer estimate, duration, and a full action plan.',
+    color: 'text-yellow-500',
+    bg: 'bg-yellow-500/10 border-yellow-500/20',
+  },
+  {
+    icon: MapPin,
+    title: 'Google Maps Integration',
+    desc: 'Volunteers explore drives on a live map with category-coloured markers, radius filtering, and one-tap Google Maps directions.',
+    color: 'text-blue-500',
+    bg: 'bg-blue-500/10 border-blue-500/20',
+  },
+  {
+    icon: Users,
+    title: 'AI Volunteer Matching',
+    desc: 'AI Finder ranks volunteers by skill, location, and availability — NGOs get a match score and reason for every suggestion.',
+    color: 'text-purple-500',
+    bg: 'bg-purple-500/10 border-purple-500/20',
+  },
+  {
+    icon: Shield,
+    title: 'NGO Verification & Flagging',
+    desc: 'Admins approve or reject NGOs in one click. AI auto-flags inactive or suspicious accounts with severity levels before they reach volunteers.',
+    color: 'text-green-500',
+    bg: 'bg-green-500/10 border-green-500/20',
+  },
+  {
+    icon: Camera,
+    title: 'Drive Verification with Photos',
+    desc: 'Volunteers submit photo proof and impact data after a drive. Gemini AI generates a verified impact report — trees planted, waste cleared, area covered.',
+    color: 'text-pink-500',
+    bg: 'bg-pink-500/10 border-pink-500/20',
+  },
+  {
+    icon: Trophy,
+    title: 'XP, Streaks & Badges',
+    desc: 'Volunteers earn XP per drive, maintain daily streaks, and unlock 6 badges — Tree Planter, Eco Warrior, Champion, and more.',
+    color: 'text-orange-500',
+    bg: 'bg-orange-500/10 border-orange-500/20',
+  },
+  {
+    icon: MessageSquare,
+    title: 'Live Drive Updates',
+    desc: 'NGOs post real-time updates inside each drive. Joined volunteers see a live feed — keeping everyone aligned before and during the event.',
+    color: 'text-cyan-500',
+    bg: 'bg-cyan-500/10 border-cyan-500/20',
+  },
+  {
+    icon: BarChart3,
+    title: 'Analytics Dashboards',
+    desc: 'NGOs track volunteer trends and drive performance. Admins get platform-wide charts — weekly activity, category breakdown, and user growth.',
+    color: 'text-teal-500',
+    bg: 'bg-teal-500/10 border-teal-500/20',
+  },
+  {
+    icon: Recycle,
+    title: '6 Drive Categories',
+    desc: 'Cleanup, Plantation, Water Conservation, Awareness, Recycling, and Wildlife — each with its own colour coding, icons, and AI-tailored action plans.',
+    color: 'text-lime-500',
+    bg: 'bg-lime-500/10 border-lime-500/20',
+  },
 ]
 
 const stats = [
@@ -442,7 +500,7 @@ export default function Landing() {
           <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
             <span className="text-sm text-green-500 font-semibold tracking-wider uppercase">Platform Features</span>
             <h2 className="text-4xl md:text-5xl font-black mt-3 mb-4" style={{ color: 'var(--text-primary)' }}>
-              Built for <span className="text-gradient">Real Impact</span>
+              Platform <span className="text-gradient">Features</span>
             </h2>
             <p className="max-w-xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
               Every feature is designed to reduce friction between environmental intent and action.
@@ -486,46 +544,6 @@ export default function Landing() {
                 </div>
                 <h3 className="font-bold mb-2" style={{ color: 'var(--text-primary)' }}>{title}</h3>
                 <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Live Impact Numbers ── */}
-      <section id="impact" className="py-20 px-6" style={{ background: isDark ? 'rgba(34,197,94,0.03)' : 'rgba(34,197,94,0.02)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
-        <div className="max-w-6xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 rounded-full" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)' }}>
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs font-semibold text-green-400 uppercase tracking-wider">Live Platform Impact</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black mt-2" style={{ color: 'var(--text-primary)' }}>
-              Real numbers. <span className="text-gradient">Real change.</span>
-            </h2>
-            <p className="mt-3 max-w-md mx-auto text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Every drive, every volunteer hour, every tree — tracked and measured in real time.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {liveImpact.map(({ value, label, suffix, icon: Icon, color, bg }, i) => (
-              <motion.div
-                key={label}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.07 }}
-                whileHover={{ y: -5, scale: 1.03 }}
-                className="card rounded-2xl p-5 text-center hover:border-green-500/30 transition-all"
-              >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3 border ${bg} ${color}`}>
-                  <Icon size={18} />
-                </div>
-                <div className={`text-2xl font-black mb-1 ${color}`}>
-                  <AnimatedCounter value={value} suffix={suffix} />
-                </div>
-                <p className="text-xs leading-tight" style={{ color: 'var(--text-muted)' }}>{label}</p>
               </motion.div>
             ))}
           </div>
