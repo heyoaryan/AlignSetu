@@ -8,6 +8,7 @@ import Auth from './pages/Auth'
 import NGODashboard from './pages/NGODashboard'
 import VolunteerDashboard from './pages/VolunteerDashboard'
 import AdminDashboard from './pages/AdminDashboard'
+import PublicIntake from './pages/PublicIntake'
 
 function ProtectedRoute({ children, allowedRoles }) {
   const { currentUser, userRole } = useAuth()
@@ -30,6 +31,7 @@ function AppRoutes() {
         <Route path="/ngo/*" element={<ProtectedRoute allowedRoles={['ngo']}><NGODashboard /></ProtectedRoute>} />
         <Route path="/volunteer/*" element={<ProtectedRoute allowedRoles={['volunteer']}><VolunteerDashboard /></ProtectedRoute>} />
         <Route path="/admin/*" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/intake/:ngoId" element={<PublicIntake />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>

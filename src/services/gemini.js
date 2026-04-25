@@ -263,3 +263,115 @@ Respond ONLY with valid JSON.
     }
   }
 }
+
+/**
+ * Analyzes a public need submission and matches it against NGO's existing drives.
+ * Called automatically when someone submits via QR form.
+ * @param {Object} need - { category, description, location, urgency }
+ * @param {Array} ngoDrives - NGO's current active drives
+ * @returns {Object} { confirmedCategory, confirmedUrgency, summary, matchedDriveId, matchReason, suggestedDriveTitle, suggestedDriveDesc, actionable }
+ */
+export async function analyzePublicNeed(need, ngoDrives) {
+  const prompt = `
+You are AlignSetu AI. A member of the public has submitted a community need via QR code scan.
+Your job is to:
+1. Confirm/correct the category and urgency based on the description
+2. Match it against the NGO's existing drives (if any match)
+3. If no match, suggest a new drive the NGO should create
+
+Public Need:
+- Category selected: ${need.category}
+- Urgency selected: ${need.urgency}
+- Description: "${need.description}"
+- Location: "${need.location}"
+
+NGO's Active Drives:
+${ngoDrives.length > 0
+  ? JSON.stringify(ngoDrives.map(d => ({ id: d.id, title: d.title, category: d.category, location: d.location, description: d.description?.slice(0, 80) })))
+  : 'No active drives yet'}
+
+Return a JSON object:
+- confirmedCategory: corrected category (one of: cleanup, plantation, water, recycling, health, other)
+- confirmedUrgency: corrected urgency (one of: low, medium, high)
+- summary: one sentence summarizing this need in simple Hindi-English (e.g. "Yamuna ke paas safai ki zarurat hai")
+- matchedDriveId: id of the best matching existing drive, or null if none
+- matchReason: why it matches (max 10 words), or null
+- matchScore: 0-100 how well it matches the existing drive, or 0
+- suggestedDriveTitle: if no match, suggest a drive title (max 8 words)
+- suggestedDriveDesc: if no match, 1-sentence drive description
+- actionable: one short instruction for the NGO (max 12 words, in Hinglish)
+
+Respond ONLY with valid JSON.
+`
+  try {
+    return JSON.parse(await callGemini(prompt, 500))
+  } catch {
+    return {
+      confirmedCategory: need.category,
+      confirmedUrgency: need.urgency,
+      summary: need.description?.slice(0, 60) + '…',
+      matchedDriveId: null,
+      matchReason: null,
+      matchScore: 0,
+      suggestedDriveTitle: `${need.category} drive in ${need.location}`,
+      suggestedDriveDesc: `Address the reported ${need.category} issue in ${need.location}.`,
+      actionable: 'Review this need and take action',
+    }
+  }
+}
+
+/**
+ * Analyzes a photo submitted with a public need using Gemini Vision.
+ * Returns urgency assessment, what's visible, and confidence.
+ * @param {string} base64Image - base64 encoded image (without data: prefix)
+ * @param {string} mimeType - e.g. 'image/jpeg'
+ * @param {string} userDescription - what the user wrote/said
+ * @returns {Object} { urgency, confidence, whatISee, urgencyReason, isLegitimate }
+ */
+export async function analyzeNeedPhoto(base64Image, mimeType, userDescription) {
+  const prompt = `
+You are AlignSetu AI analyzing a photo submitted by a community member reporting an environmental or social need.
+
+User's description: "${userDescription || 'No description provided'}"
+
+Look at this photo carefully and assess:
+1. What environmental/social problem is visible?
+2. How urgent is this situation?
+3. Is this a legitimate need (not spam/irrelevant)?
+
+Return a JSON object:
+- urgency: one of "low", "medium", "high" — based on what you actually see in the photo
+- confidence: 0-100 how confident you are in the urgency assessment
+- whatISee: one sentence describing what's visible in the photo (in simple English)
+- urgencyReason: one short sentence (max 12 words) explaining why this urgency level — in Hinglish
+- isLegitimate: true/false — is this a real environmental/community need?
+- category: best matching category from ["cleanup","plantation","water","recycling","health","other"]
+
+Be strict: if photo shows garbage/flooding/pollution → high urgency. If minor issue → low/medium.
+Respond ONLY with valid JSON.
+`
+
+  const response = await fetch(GEMINI_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{
+        parts: [
+          { text: prompt },
+          {
+            inline_data: {
+              mime_type: mimeType,
+              data: base64Image,
+            }
+          }
+        ]
+      }],
+      generationConfig: { temperature: 0.2, maxOutputTokens: 400 },
+    }),
+  })
+
+  if (!response.ok) throw new Error('Gemini Vision API error')
+  const data = await response.json()
+  const text = data.candidates[0].content.parts[0].text
+  return JSON.parse(text.replace(/```json\n?|\n?```/g, '').trim())
+}

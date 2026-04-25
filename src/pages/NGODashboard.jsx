@@ -5,7 +5,7 @@ import {
   TreePine, Users, CheckCircle, Zap, TrendingUp, Sparkles,
   ArrowUpRight, Bell, Globe, Target, Leaf,
   Sun, Moon, Save, User, Mail, Phone, MapPin, Shield, Menu, Filter, Search,
-  FileCheck, Clock, CheckCircle2, AlertCircle, X, MessageSquare, Camera
+  FileCheck, Clock, CheckCircle2, AlertCircle, X, MessageSquare, Camera, QrCode, Inbox
 } from 'lucide-react'
 import { collection, addDoc, updateDoc, doc, query, where, onSnapshot, serverTimestamp, db } from '../config/firebase'
 import { useAuth } from '../context/AuthContext'
@@ -17,6 +17,8 @@ import StatCard from '../components/StatCard'
 import AIFinder from '../components/AIFinder'
 import DriveVerificationModal from '../components/DriveVerificationModal'
 import DriveDetailModal from '../components/DriveDetailModal'
+import QRIntakeModal from '../components/QRIntakeModal'
+import PublicNeedsPanel from '../components/PublicNeedsPanel'
 import toast from 'react-hot-toast'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
 
@@ -24,6 +26,7 @@ const sidebarLinks = [
   { to: '/ngo', icon: LayoutDashboard, label: 'Overview' },
   { to: '/ngo/drives', icon: List, label: 'Drives' },
   { to: '/ngo/verification', icon: FileCheck, label: 'Verification' },
+  { to: '/ngo/needs', icon: Inbox, label: 'Public Needs' },
   { to: '/ngo/ai-finder', icon: Sparkles, label: 'AI Finder', badge: 'AI' },
   { to: '/ngo/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/ngo/settings', icon: Settings, label: 'Settings' },
@@ -66,6 +69,7 @@ export default function NGODashboard() {
     newVolunteer: true, driveReminder: true, aiAnalysis: false, weeklyReport: true
   })
   const [selectedDrive, setSelectedDrive] = useState(null)
+  const [qrModalOpen, setQrModalOpen] = useState(false)
 
   useEffect(() => {
     if (!currentUser) return
@@ -163,6 +167,7 @@ export default function NGODashboard() {
                   {activeSection === 'overview' && 'Overview'}
                   {activeSection === 'drives' && 'My Drives'}
                   {activeSection === 'verification' && 'Verification'}
+                  {activeSection === 'needs' && 'Public Needs'}
                   {activeSection === 'analytics' && 'Analytics'}
                   {activeSection === 'settings' && 'Settings'}
                 </h1>
@@ -172,6 +177,12 @@ export default function NGODashboard() {
               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={toggle}
                 className="p-2.5 rounded-xl card border-theme">
                 {isDark ? <Sun size={16} className="text-yellow-400" /> : <Moon size={16} className="text-blue-400" />}
+              </motion.button>
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                onClick={() => setQrModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                style={{ background: 'rgba(99,102,241,0.15)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }}>
+                <QrCode size={15} /> QR Intake
               </motion.button>
               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                 onClick={() => setAiFinderOpen(true)}
@@ -228,6 +239,8 @@ export default function NGODashboard() {
                     <h2 className="font-semibold text-primary mb-4">Quick Actions</h2>
                     {[
                       { icon: Plus, label: 'Create New Drive', action: () => setModalOpen(true), color: 'text-green-400', bg: 'bg-green-500/10' },
+                      { icon: QrCode, label: 'QR Data Intake', action: () => setQrModalOpen(true), color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
+                      { icon: Inbox, label: 'Public Needs', action: () => setActiveSection('needs'), color: 'text-orange-400', bg: 'bg-orange-500/10' },
                       { icon: Sparkles, label: 'AI Volunteer Finder', action: () => setAiFinderOpen(true), color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
                       { icon: BarChart3, label: 'View Analytics', action: () => setActiveSection('analytics'), color: 'text-blue-400', bg: 'bg-blue-500/10' },
                       { icon: Settings, label: 'NGO Settings', action: () => setActiveSection('settings'), color: 'text-purple-400', bg: 'bg-purple-500/10' },
@@ -538,6 +551,16 @@ export default function NGODashboard() {
               </motion.div>
             )}
 
+            {/* ── PUBLIC NEEDS ── */}
+            {activeSection === 'needs' && (
+              <motion.div key="needs" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <PublicNeedsPanel
+                  ngoId={currentUser?.uid}
+                  onOpenQR={() => setQrModalOpen(true)}
+                />
+              </motion.div>
+            )}
+
             {/* ── ANALYTICS ── */}
             {activeSection === 'analytics' && (
               <motion.div key="analytics" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-5">
@@ -804,6 +827,12 @@ export default function NGODashboard() {
         open={!!selectedDrive}
         onClose={() => setSelectedDrive(null)}
         isNGO={true}
+      />
+      <QRIntakeModal
+        open={qrModalOpen}
+        onClose={() => setQrModalOpen(false)}
+        ngoId={currentUser?.uid}
+        ngoName={profileData.name || currentUser?.displayName || 'My NGO'}
       />
 
       {/* Drive Completion Popup */}

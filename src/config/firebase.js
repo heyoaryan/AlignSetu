@@ -16,6 +16,8 @@ const firebaseConfig = {
 const store = {
   drives: {},
   users: {},
+  publicNeeds: {},
+  ngoProfiles: {},
 }
 
 let idCounter = 1000

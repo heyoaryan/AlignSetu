@@ -9,7 +9,7 @@ const sectionMap = {
   'Analytics': 'analytics', 'Settings': 'settings', 'Verification': 'verification',
   'Map View': 'map', 'Browse Drives': 'drives', 'My Profile': 'profile',
   'NGO Verification': 'ngos', 'Flagged NGOs': 'flagged', 'Live Map': 'map',
-  'Drives': 'drives',
+  'Drives': 'drives', 'Public Needs': 'needs',
 }
 
 export default function Sidebar({ links, activeSection, onSectionChange, onAIFinder, mobileOpen, onMobileClose }) {
