@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Map, List, User, Star, MapPin, Clock,
   CheckCircle, Zap, TreePine, Award, Target, Search,
   Sun, Moon, Briefcase, GraduationCap, Heart, Building2,
-  Wrench, Coffee, Globe, TrendingUp, Calendar, Edit3, Save, Menu,
+  Wrench, Coffee, Globe, TrendingUp, Calendar, Edit3, Save, Menu, Leaf,
   Flame, Trophy, Camera, Image, CheckCircle2, AlertCircle, History, Users, Sparkles
 } from 'lucide-react'
 import { collection, onSnapshot, doc, updateDoc, increment, getDoc, db } from '../config/firebase'
@@ -296,12 +296,20 @@ export default function VolunteerDashboard() {
                 className="md:hidden p-2 rounded-xl card b-theme" style={{ color: 'var(--text-secondary)' }}>
                 <Menu size={20} />
               </button>
-              <div>
+              {/* Mobile logo */}
+              <div className="flex md:hidden items-center gap-2">
+                <div className="w-7 h-7 bg-green-500 rounded-lg flex items-center justify-center">
+                  <Leaf size={15} className="text-black" />
+                </div>
+                <span className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>Align<span className="text-green-500">Setu</span></span>
+              </div>
+              {/* Desktop title */}
+              <div className="hidden md:block">
                 <div className="flex items-center gap-2 mb-0.5">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                   <span className="text-xs text-green-400 font-medium uppercase tracking-wider">Volunteer Dashboard</span>
                 </div>
-                <h1 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   {activeSection === 'overview' && 'Overview'}
                   {activeSection === 'map' && 'Map View'}
                   {activeSection === 'drives' && 'Browse Drives'}

@@ -154,16 +154,26 @@ export default function NGODashboard() {
 
           {/* Topbar */}
           <div className="flex items-center justify-between mb-8">
+            {/* Mobile: Logo + dark mode only | Desktop: section title */}
             <div className="flex items-center gap-3">
+              {/* Mobile hamburger */}
               <button onClick={() => setMobileSidebarOpen(true)} className="md:hidden p-2 rounded-xl card b-theme" style={{ color: 'var(--text-secondary)' }}>
                 <Menu size={20} />
               </button>
-              <div>
+              {/* Mobile logo */}
+              <div className="flex md:hidden items-center gap-2">
+                <div className="w-7 h-7 bg-green-500 rounded-lg flex items-center justify-center">
+                  <Leaf size={15} className="text-black" />
+                </div>
+                <span className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>Align<span className="text-green-500">Setu</span></span>
+              </div>
+              {/* Desktop section title */}
+              <div className="hidden md:block">
                 <div className="flex items-center gap-2 mb-0.5">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                   <span className="text-xs text-green-400 font-medium uppercase tracking-wider">NGO Dashboard</span>
                 </div>
-                <h1 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   {activeSection === 'overview' && 'Overview'}
                   {activeSection === 'drives' && 'My Drives'}
                   {activeSection === 'verification' && 'Verification'}
@@ -180,13 +190,13 @@ export default function NGODashboard() {
               </motion.button>
               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                 onClick={() => setQrModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
                 style={{ background: 'rgba(99,102,241,0.15)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }}>
                 <QrCode size={15} /> QR Intake
               </motion.button>
               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                 onClick={() => setAiFinderOpen(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
                 style={{ background: 'rgba(34,197,94,0.15)', color: '#4ade80', border: '1px solid rgba(34,197,94,0.3)' }}>
                 <Sparkles size={15} /> AI Finder
               </motion.button>
