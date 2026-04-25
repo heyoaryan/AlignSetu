@@ -157,7 +157,7 @@ export default function VolunteerDashboard() {
       xp,
       streak,
       skills: userSkills,
-      badgesEarned: getBadges(joinedDrives, drives, userSkills, streak).filter(b => b.earned).length,
+      badgesEarned: 0,
     })
       .then(n => setAiNudge(n))
       .catch(() => {})
@@ -182,7 +182,7 @@ export default function VolunteerDashboard() {
     try {
       const newJoined = [...joinedDrives, drive.id]
       const today = new Date().toDateString()
-      const lastJoinDate = localStorage.getItem(`alignsetu_lastjoin_${currentUser.uid}`)
+      const lastJoinDate = localStorage.getItem(`alignsetu_lastjoin_${currentUser?.uid || 'guest'}`)
       const yesterday = new Date(Date.now() - 86400000).toDateString()
 
       let newStreak = streak
@@ -191,18 +191,25 @@ export default function VolunteerDashboard() {
       } else if (lastJoinDate !== today) {
         newStreak = 1
       }
-      localStorage.setItem(`alignsetu_lastjoin_${currentUser.uid}`, today)
+      localStorage.setItem(`alignsetu_lastjoin_${currentUser?.uid || 'guest'}`, today)
 
       const streakBonus = newStreak >= 3 ? XP_STREAK_BONUS : 0
       const xpGained = XP_PER_JOIN + streakBonus
       const newXp = xp + xpGained
 
-      await updateDoc(doc(db, 'drives', drive.id), { volunteersJoined: increment(1) })
-      await updateDoc(doc(db, 'users', currentUser.uid), {
-        joinedDrives: newJoined,
-        xp: newXp,
-        streak: newStreak,
-      })
+      const isMockDrive = drive.id?.startsWith('mock-')
+
+      if (!isMockDrive && currentUser) {
+        // Real Firebase drive — write to DB
+        await updateDoc(doc(db, 'drives', drive.id), { volunteersJoined: increment(1) })
+        await updateDoc(doc(db, 'users', currentUser.uid), {
+          joinedDrives: newJoined,
+          xp: newXp,
+          streak: newStreak,
+        })
+      }
+
+      // Always update local state (works for both mock and real)
       setJoinedDrives(newJoined)
       setXp(newXp)
       setStreak(newStreak)
@@ -255,7 +262,172 @@ export default function VolunteerDashboard() {
     )
   }
 
-  const drivesWithCoords = drives.map(d => ({
+  // ── Mock drives for prototype — shown when Firebase has no data ──
+  const MOCK_VOLUNTEER_DRIVES = [
+    {
+      id: 'mock-v1',
+      title: 'Community Food Distribution Drive',
+      category: 'food',
+      location: 'Connaught Place, New Delhi',
+      date: '2026-05-10',
+      duration: '4 hours',
+      urgency: 'high',
+      estimatedVolunteers: 30,
+      volunteersJoined: 22,
+      status: 'active',
+      description: 'Distributing nutritious meal packets to underprivileged families and homeless individuals around CP. Volunteers will help pack and distribute food.',
+      skills: ['Cooking', 'Driving', 'Social Media'],
+      ngoId: 'mock-ngo-1',
+      lat: 28.6315, lng: 77.2167,
+    },
+    {
+      id: 'mock-v2',
+      title: 'Free Health Check-up Camp',
+      category: 'health',
+      location: 'Lajpat Nagar, New Delhi',
+      date: '2026-05-12',
+      duration: '6 hours',
+      urgency: 'critical',
+      estimatedVolunteers: 20,
+      volunteersJoined: 14,
+      status: 'active',
+      description: 'Free blood pressure, sugar, and general health screening for residents. Doctors and paramedics will be present.',
+      skills: ['First Aid', 'Medical', 'Data Entry'],
+      ngoId: 'mock-ngo-2',
+      lat: 28.5677, lng: 77.2433,
+    },
+    {
+      id: 'mock-v3',
+      title: 'Mental Health Awareness Walk',
+      category: 'awareness',
+      location: 'India Gate Lawns, New Delhi',
+      date: '2026-05-15',
+      duration: '3 hours',
+      urgency: 'medium',
+      estimatedVolunteers: 50,
+      volunteersJoined: 38,
+      status: 'active',
+      description: 'A community walk to break the stigma around mental health. Participants carry placards and distribute pamphlets.',
+      skills: ['Social Media', 'Photography', 'Teaching'],
+      ngoId: 'mock-ngo-1',
+      lat: 28.6129, lng: 77.2295,
+    },
+    {
+      id: 'mock-v4',
+      title: 'Hunger-Free Weekend — Meal Drive',
+      category: 'food',
+      location: 'Nizamuddin Basti, New Delhi',
+      date: '2026-05-17',
+      duration: '5 hours',
+      urgency: 'high',
+      estimatedVolunteers: 25,
+      volunteersJoined: 18,
+      status: 'active',
+      description: 'Weekend meal drive serving hot cooked food to 500+ residents of Nizamuddin Basti.',
+      skills: ['Cooking', 'Waste Management'],
+      ngoId: 'mock-ngo-3',
+      lat: 28.5921, lng: 77.2461,
+    },
+    {
+      id: 'mock-v5',
+      title: 'Eye Care & Vision Screening Camp',
+      category: 'health',
+      location: 'Rohini Sector 11, New Delhi',
+      date: '2026-05-20',
+      duration: '5 hours',
+      urgency: 'medium',
+      estimatedVolunteers: 15,
+      volunteersJoined: 9,
+      status: 'active',
+      description: 'Free eye check-up and spectacle distribution for school children and senior citizens.',
+      skills: ['Medical', 'First Aid', 'Data Entry'],
+      ngoId: 'mock-ngo-2',
+      lat: 28.7041, lng: 77.1025,
+    },
+    {
+      id: 'mock-v6',
+      title: 'Road Safety Awareness Campaign',
+      category: 'awareness',
+      location: 'Dwarka Sector 10, New Delhi',
+      date: '2026-05-22',
+      duration: '3 hours',
+      urgency: 'low',
+      estimatedVolunteers: 40,
+      volunteersJoined: 27,
+      status: 'active',
+      description: 'Educating commuters and school students about road safety rules, helmet usage, and pedestrian safety.',
+      skills: ['Teaching', 'Photography', 'Social Media'],
+      ngoId: 'mock-ngo-3',
+      lat: 28.5921, lng: 77.0460,
+    },
+    {
+      id: 'mock-v7',
+      title: 'Ration Kit Distribution — Flood Relief',
+      category: 'food',
+      location: 'Yamuna Khadar, East Delhi',
+      date: '2026-05-25',
+      duration: '6 hours',
+      urgency: 'critical',
+      estimatedVolunteers: 35,
+      volunteersJoined: 29,
+      status: 'active',
+      description: 'Emergency ration kits being distributed to flood-affected families near Yamuna banks.',
+      skills: ['Driving', 'Waste Management', 'Cooking'],
+      ngoId: 'mock-ngo-1',
+      lat: 28.6562, lng: 77.3210,
+    },
+    {
+      id: 'mock-v8',
+      title: 'Dental Health Camp for Children',
+      category: 'health',
+      location: 'Govindpuri, South Delhi',
+      date: '2026-05-28',
+      duration: '4 hours',
+      urgency: 'medium',
+      estimatedVolunteers: 12,
+      volunteersJoined: 7,
+      status: 'active',
+      description: 'Free dental check-up and oral hygiene education for children aged 5–15.',
+      skills: ['Medical', 'Teaching', 'First Aid'],
+      ngoId: 'mock-ngo-2',
+      lat: 28.5355, lng: 77.2590,
+    },
+    {
+      id: 'mock-v9',
+      title: 'Digital Literacy Awareness Drive',
+      category: 'awareness',
+      location: 'Sangam Vihar, South Delhi',
+      date: '2026-06-01',
+      duration: '4 hours',
+      urgency: 'low',
+      estimatedVolunteers: 20,
+      volunteersJoined: 11,
+      status: 'active',
+      description: 'Teaching senior citizens and women about smartphone usage, UPI payments, and online safety.',
+      skills: ['Teaching', 'Data Entry', 'Social Media'],
+      ngoId: 'mock-ngo-3',
+      lat: 28.5013, lng: 77.2590,
+    },
+  ]
+
+  // Mock joined drives — empty so user can join themselves
+  const MOCK_JOINED_IDS = []
+  const MOCK_JOINED_DRIVES = []
+
+  // Use mock data when Firebase has no drives
+  const allDrives = drives.length > 0 ? drives : MOCK_VOLUNTEER_DRIVES
+  const effectiveJoinedDrives = joinedDrives  // always use live state — updated locally for mock drives too
+  const effectiveXp = xp > 0 ? xp : (drives.length > 0 ? 0 : 0)
+  const effectiveStreak = streak > 0 ? streak : (drives.length > 0 ? 0 : 3) // mock: 3-day streak
+
+  const filteredDrives = allDrives.filter(d =>
+    !searchQuery ||
+    d.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    d.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    d.location?.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const drivesWithCoords = allDrives.map(d => ({
     ...d,
     lat: d.lat || 28.6139 + (Math.random() - 0.5) * 0.12,
     lng: d.lng || 77.209 + (Math.random() - 0.5) * 0.12,
@@ -271,13 +443,6 @@ export default function VolunteerDashboard() {
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) <= radiusKm
       })
     : drivesWithCoords
-
-  const filteredDrives = drives.filter(d =>
-    !searchQuery ||
-    d.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    d.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    d.location?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   const selectedType = volunteerTypes.find(t => t.value === volunteerType)
 
@@ -330,10 +495,10 @@ export default function VolunteerDashboard() {
             {activeSection === 'overview' && (
               <motion.div key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <StatCard icon={CheckCircle} value={joinedDrives.length} label="Drives Joined" color="green" />
-                  <StatCard icon={Clock} value={joinedDrives.length * 3} label="Hours Contributed" color="blue" suffix="h" />
-                  <StatCard icon={Zap} value={xp} label="Total XP" color="orange" />
-                  <StatCard icon={Flame} value={`${streak}d`} label="Current Streak" color="purple" />
+                  <StatCard icon={CheckCircle} value={effectiveJoinedDrives.length} label="Drives Joined" color="green" />
+                  <StatCard icon={Clock} value={effectiveJoinedDrives.length * 3} label="Hours Contributed" color="blue" suffix="h" />
+                  <StatCard icon={Zap} value={effectiveXp} label="Total XP" color="orange" />
+                  <StatCard icon={Flame} value={effectiveStreak} label="Current Streak" color="purple" suffix="d" />
                 </div>
 
                 {/* ── AlignSetu AI Nudge ── */}
@@ -403,7 +568,7 @@ export default function VolunteerDashboard() {
                 {/* Upcoming joined drives */}
                 <div>
                   <h2 className="font-semibold text-primary mb-4">Your Joined Drives</h2>
-                  {joinedDrives.length === 0 ? (
+                  {effectiveJoinedDrives.length === 0 ? (
                     <div className="card p-10 text-center">
                       <Calendar size={28} className="text-muted mx-auto mb-3" />
                       <p className="text-secondary text-sm">You haven't joined any drives yet.</p>
@@ -411,7 +576,7 @@ export default function VolunteerDashboard() {
                     </div>
                   ) : (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {drives.filter(d => joinedDrives.includes(d.id)).slice(0, 3).map((drive, i) => (
+                      {allDrives.filter(d => effectiveJoinedDrives.includes(d.id)).slice(0, 3).map((drive, i) => (
                         <motion.div key={drive.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
                           <DriveCard drive={drive} joined={true} onViewDetails={openDriveDetail} />
                         </motion.div>
@@ -615,7 +780,7 @@ export default function VolunteerDashboard() {
                     ) : (
                       <div className="grid md:grid-cols-3 gap-4">
                         {aiRecommendations.map((rec, i) => {
-                          const drive = drives.find(d => d.id === rec.id)
+                          const drive = allDrives.find(d => d.id === rec.id)
                           if (!drive) return null
                           return (
                             <motion.div key={rec.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
@@ -684,11 +849,11 @@ export default function VolunteerDashboard() {
                     <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                     <h2 className="font-semibold text-primary">Active Drives</h2>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/25 font-medium">
-                      {drives.filter(d => joinedDrives.includes(d.id) && d.status === 'active').length}
+                      {allDrives.filter(d => effectiveJoinedDrives.includes(d.id) && d.status === 'active').length}
                     </span>
                   </div>
 
-                  {drives.filter(d => joinedDrives.includes(d.id) && d.status === 'active').length === 0 ? (
+                  {allDrives.filter(d => effectiveJoinedDrives.includes(d.id) && d.status === 'active').length === 0 ? (
                     <div className="card p-10 text-center">
                       <Zap size={28} className="text-muted mx-auto mb-3" />
                       <p className="text-secondary text-sm">No active drives joined yet.</p>
@@ -696,7 +861,7 @@ export default function VolunteerDashboard() {
                     </div>
                   ) : (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {drives.filter(d => joinedDrives.includes(d.id) && d.status === 'active').map((drive, i) => {
+                      {allDrives.filter(d => effectiveJoinedDrives.includes(d.id) && d.status === 'active').map((drive, i) => {
                         const mySubmission = drive.volunteerSubmissions?.find(s => s.volunteerId === currentUser?.uid)
                         return (
                           <motion.div key={drive.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
@@ -784,11 +949,11 @@ export default function VolunteerDashboard() {
                     <History size={14} className="text-secondary" />
                     <h2 className="font-semibold text-primary">Past Drives</h2>
                     <span className="text-xs px-2 py-0.5 rounded-full bg-gray-500/15 text-secondary border border-gray-500/20 font-medium">
-                      {drives.filter(d => joinedDrives.includes(d.id) && d.status === 'completed').length}
+                      {allDrives.filter(d => effectiveJoinedDrives.includes(d.id) && d.status === 'completed').length}
                     </span>
                   </div>
 
-                  {drives.filter(d => joinedDrives.includes(d.id) && d.status === 'completed').length === 0 ? (
+                  {allDrives.filter(d => effectiveJoinedDrives.includes(d.id) && d.status === 'completed').length === 0 ? (
                     <div className="card p-10 text-center">
                       <History size={28} className="text-muted mx-auto mb-3" />
                       <p className="text-secondary text-sm">No completed drives yet.</p>
@@ -796,7 +961,7 @@ export default function VolunteerDashboard() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {drives.filter(d => joinedDrives.includes(d.id) && d.status === 'completed').map((drive, i) => {
+                      {allDrives.filter(d => effectiveJoinedDrives.includes(d.id) && d.status === 'completed').map((drive, i) => {
                         const mySubmission = drive.volunteerSubmissions?.find(s => s.volunteerId === currentUser?.uid)
                         const verified = drive.verification
                         return (

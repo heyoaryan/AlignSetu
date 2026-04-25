@@ -33,12 +33,101 @@ const sidebarLinks = [
 ]
 
 const chartData = [
-  { month: 'Jan', volunteers: 12, drives: 2 },
-  { month: 'Feb', volunteers: 28, drives: 4 },
-  { month: 'Mar', volunteers: 45, drives: 5 },
-  { month: 'Apr', volunteers: 38, drives: 3 },
-  { month: 'May', volunteers: 62, drives: 7 },
-  { month: 'Jun', volunteers: 89, drives: 9 },
+  { month: 'Jan', volunteers: 18, drives: 3 },
+  { month: 'Feb', volunteers: 35, drives: 5 },
+  { month: 'Mar', volunteers: 58, drives: 7 },
+  { month: 'Apr', volunteers: 47, drives: 4 },
+  { month: 'May', volunteers: 82, drives: 9 },
+  { month: 'Jun', volunteers: 114, drives: 12 },
+]
+
+// Mock drives for prototype — food, health, awareness
+const MOCK_NGO_DRIVES = [
+  {
+    id: 'mock-ngo-1',
+    title: 'Community Food Distribution Drive',
+    category: 'food',
+    location: 'Connaught Place, New Delhi',
+    date: '2026-05-10',
+    duration: '4 hours',
+    urgency: 'high',
+    estimatedVolunteers: 30,
+    volunteersJoined: 22,
+    status: 'active',
+    description: 'Distributing nutritious meal packets to underprivileged families and homeless individuals around CP.',
+    skills: ['Cooking', 'Driving', 'Social Media'],
+  },
+  {
+    id: 'mock-ngo-2',
+    title: 'Free Health Check-up Camp',
+    category: 'health',
+    location: 'Lajpat Nagar, New Delhi',
+    date: '2026-05-12',
+    duration: '6 hours',
+    urgency: 'critical',
+    estimatedVolunteers: 20,
+    volunteersJoined: 14,
+    status: 'active',
+    description: 'Free blood pressure, sugar, and general health screening for residents. Doctors and paramedics on-site.',
+    skills: ['First Aid', 'Medical', 'Data Entry'],
+  },
+  {
+    id: 'mock-ngo-3',
+    title: 'Mental Health Awareness Walk',
+    category: 'awareness',
+    location: 'India Gate Lawns, New Delhi',
+    date: '2026-05-15',
+    duration: '3 hours',
+    urgency: 'medium',
+    estimatedVolunteers: 50,
+    volunteersJoined: 38,
+    status: 'active',
+    description: 'A community walk to break the stigma around mental health. Participants carry placards and distribute pamphlets.',
+    skills: ['Social Media', 'Photography', 'Teaching'],
+  },
+  {
+    id: 'mock-ngo-4',
+    title: 'Hunger-Free Weekend — Meal Drive',
+    category: 'food',
+    location: 'Nizamuddin Basti, New Delhi',
+    date: '2026-05-17',
+    duration: '5 hours',
+    urgency: 'high',
+    estimatedVolunteers: 25,
+    volunteersJoined: 18,
+    status: 'active',
+    description: 'Weekend meal drive serving hot cooked food to 500+ residents of Nizamuddin Basti.',
+    skills: ['Cooking', 'Waste Management'],
+  },
+  {
+    id: 'mock-ngo-5',
+    title: 'Eye Care & Vision Screening Camp',
+    category: 'health',
+    location: 'Rohini Sector 11, New Delhi',
+    date: '2026-05-20',
+    duration: '5 hours',
+    urgency: 'medium',
+    estimatedVolunteers: 15,
+    volunteersJoined: 9,
+    status: 'completed',
+    description: 'Free eye check-up and spectacle distribution for school children and senior citizens.',
+    skills: ['Medical', 'First Aid', 'Data Entry'],
+    verification: { impact: { treesPlanted: 0, wasteCollected: 0, peopleHelped: 120 }, photoCount: 8, verifiedAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString() },
+  },
+  {
+    id: 'mock-ngo-6',
+    title: 'Road Safety Awareness Campaign',
+    category: 'awareness',
+    location: 'Dwarka Sector 10, New Delhi',
+    date: '2026-05-22',
+    duration: '3 hours',
+    urgency: 'low',
+    estimatedVolunteers: 40,
+    volunteersJoined: 27,
+    status: 'active',
+    description: 'Educating commuters and school students about road safety rules, helmet usage, and pedestrian safety.',
+    skills: ['Teaching', 'Photography', 'Social Media'],
+  },
 ]
 
 function TT({ active, payload, label }) {
@@ -127,14 +216,17 @@ export default function NGODashboard() {
     return now - new Date(d.verification.verifiedAt).getTime() < EIGHT_HOURS
   })
 
-  const totalVols = drives.reduce((s, d) => s + (d.volunteersJoined || 0), 0)
-  const activeDrives = drives.filter(d => d.status === 'active').length
-  const completed = drives.filter(d => d.status === 'completed').length
-  const fillRate = drives.length
-    ? Math.round(drives.reduce((s, d) => s + Math.min(((d.volunteersJoined || 0) / (d.estimatedVolunteers || 20)) * 100, 100), 0) / drives.length)
+  // Use mock drives when Firebase has no data (prototype mode)
+  const allDrives = drives.length > 0 ? drives : MOCK_NGO_DRIVES
+
+  const totalVols = allDrives.reduce((s, d) => s + (d.volunteersJoined || 0), 0)
+  const activeDrives = allDrives.filter(d => d.status === 'active').length
+  const completed = allDrives.filter(d => d.status === 'completed').length
+  const fillRate = allDrives.length
+    ? Math.round(allDrives.reduce((s, d) => s + Math.min(((d.volunteersJoined || 0) / (d.estimatedVolunteers || 20)) * 100, 100), 0) / allDrives.length)
     : 0
 
-  const filteredDrives = drives
+  const filteredDrives = allDrives
     .filter(d => driveFilter === 'all' || d.status === driveFilter)
     .filter(d => !driveSearch || d.title?.toLowerCase().includes(driveSearch.toLowerCase()) || d.location?.toLowerCase().includes(driveSearch.toLowerCase()))
 
@@ -211,8 +303,8 @@ export default function NGODashboard() {
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <StatCard icon={List} value={drives.length} label="Total Drives" color="green" />
-                  <StatCard icon={Zap} value={activeDrives} label="Active Drives" color="blue" />
+                  <StatCard icon={List} value={allDrives.length} label="Total Drives" color="green" />
+                  <StatCard icon={Users} value={totalVols * 8} label="People Helped" color="blue" />
                   <StatCard icon={Users} value={totalVols} label="Volunteers Joined" color="purple" />
                   <StatCard icon={CheckCircle} value={completed} label="Completed" color="orange" />
                 </div>
@@ -268,9 +360,9 @@ export default function NGODashboard() {
                 {/* Impact row */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
-                    { label: 'Trees Planted', value: drives.length * 120, icon: TreePine, color: 'text-green-400', bg: 'bg-green-500/10' },
-                    { label: 'Waste Collected', value: `${(drives.length * 0.4).toFixed(1)}T`, icon: Zap, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-                    { label: 'Areas Covered', value: `${drives.length * 2}km²`, icon: Globe, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+                    { label: 'Trees Planted', value: allDrives.length * 120, icon: TreePine, color: 'text-green-400', bg: 'bg-green-500/10' },
+                    { label: 'Waste Collected', value: `${(allDrives.length * 0.4).toFixed(1)}T`, icon: Zap, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+                    { label: 'Areas Covered', value: `${allDrives.length * 2}km²`, icon: Globe, color: 'text-purple-400', bg: 'bg-purple-500/10' },
                     { label: 'Lives Impacted', value: totalVols * 8, icon: Users, color: 'text-orange-400', bg: 'bg-orange-500/10' },
                   ].map(({ label, value, icon: Icon, color, bg }) => (
                     <motion.div key={label} whileHover={{ y: -3 }} className="card p-5 flex items-center gap-4">
@@ -298,13 +390,12 @@ export default function NGODashboard() {
                     </div>
                   </div>
                   {drives.length === 0 ? (
-                    <div className="card p-12 text-center">
-                      <TreePine size={32} className="text-green-400 mx-auto mb-3" />
-                      <p className="text-secondary text-sm mb-4">No drives yet. Create your first one!</p>
-                      <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setModalOpen(true)}
-                        className="bg-green-500 hover:bg-green-400 text-black font-semibold px-5 py-2 rounded-xl text-sm inline-flex items-center gap-2">
-                        <Plus size={15} /> Create Drive
-                      </motion.button>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {allDrives.slice(0, 3).map((drive, i) => (
+                        <motion.div key={drive.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
+                          <DriveCard drive={drive} onViewDetails={setSelectedDrive} />
+                        </motion.div>
+                      ))}
                     </div>
                   ) : (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -345,7 +436,7 @@ export default function NGODashboard() {
                           }`}>
                           {f}
                           <span className="ml-1 opacity-60">
-                            ({f === 'all' ? drives.length : drives.filter(d => d.status === f).length})
+                            ({f === 'all' ? allDrives.length : allDrives.filter(d => d.status === f).length})
                           </span>
                         </button>
                       ))}
@@ -572,101 +663,288 @@ export default function NGODashboard() {
             )}
 
             {/* ── ANALYTICS ── */}
-            {activeSection === 'analytics' && (
-              <motion.div key="analytics" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-5">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <StatCard icon={Users} value={totalVols} label="Total Volunteers" color="green" />
-                  <StatCard icon={Target} value={fillRate} label="Avg. Fill Rate" color="blue" suffix="%" />
-                  <StatCard icon={Globe} value={drives.length * 2} label="Areas Covered" color="purple" />
-                  <StatCard icon={Leaf} value={drives.length * 120} label="Trees Planted" color="orange" />
-                </div>
+            {activeSection === 'analytics' && (() => {
+              // Real impact from verified drives
+              const verifiedDrives = allDrives.filter(d => d.status === 'completed' && d.verification?.impact)
+              const totalTrees = verifiedDrives.reduce((s, d) => s + (Number(d.verification.impact.treesPlanted) || 0), 0)
+              const totalWaste = verifiedDrives.reduce((s, d) => s + (Number(d.verification.impact.wasteCollected) || 0), 0)
+              const totalAttended = verifiedDrives.reduce((s, d) => s + (Number(d.verification.impact.volunteersAttended) || 0), 0)
+              const avgImpactScore = verifiedDrives.length
+                ? Math.round(verifiedDrives.reduce((s, d) => s + (d.verification.aiResult?.impactScore || 0), 0) / verifiedDrives.length * 10) / 10
+                : 0
 
-                <div className="grid lg:grid-cols-2 gap-5">
-                  <div className="card p-6">
-                    <h2 className="font-semibold text-primary mb-5">Monthly Drives Created</h2>
-                    <ResponsiveContainer width="100%" height={200}>
-                      <BarChart data={chartData} barSize={24}>
-                        <XAxis dataKey="month" tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
-                        <Tooltip content={<TT />} />
-                        <Bar dataKey="drives" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="card p-6">
-                    <h2 className="font-semibold text-primary mb-5">Volunteer Growth</h2>
-                    <ResponsiveContainer width="100%" height={200}>
-                      <AreaChart data={chartData}>
-                        <defs>
-                          <linearGradient id="ga" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#818cf8" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
-                          </linearGradient>
-                        </defs>
-                        <XAxis dataKey="month" tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
-                        <Tooltip content={<TT />} />
-                        <Area type="monotone" dataKey="volunteers" stroke="#818cf8" strokeWidth={2} fill="url(#ga)" />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
+              // Build monthly chart data from real drives
+              const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+              const monthlyMap = {}
+              allDrives.forEach(d => {
+                const ts = d.createdAt?.toDate ? d.createdAt.toDate() : d.createdAt ? new Date(d.createdAt) : null
+                if (!ts) return
+                const key = monthNames[ts.getMonth()]
+                if (!monthlyMap[key]) monthlyMap[key] = { month: key, drives: 0, volunteers: 0, trees: 0 }
+                monthlyMap[key].drives += 1
+                monthlyMap[key].volunteers += d.volunteersJoined || 0
+                if (d.verification?.impact?.treesPlanted) monthlyMap[key].trees += Number(d.verification.impact.treesPlanted) || 0
+              })
+              const realChartData = monthNames
+                .filter(m => monthlyMap[m])
+                .map(m => monthlyMap[m])
+              const displayChartData = realChartData.length >= 2 ? realChartData : chartData
 
-                <div className="card p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="font-semibold text-primary">Drive Fill Rate</h2>
-                    <span className="text-xs text-secondary">{drives.length} drives total</span>
+              // Top performing drives by fill rate
+              const topDrives = [...allDrives]
+                .map(d => ({ ...d, pct: Math.min(((d.volunteersJoined || 0) / (d.estimatedVolunteers || 20)) * 100, 100) }))
+                .sort((a, b) => b.pct - a.pct)
+                .slice(0, 5)
+
+              // Category breakdown with icons
+              const catIcons = { tree_plantation: '🌳', waste_cleanup: '♻️', awareness: '📢', food_drive: '🍱', food: '🍱', health: '🏥', water_conservation: '💧', other: '🌍' }
+              const catMap = allDrives.reduce((acc, d) => {
+                const cat = d.category || 'other'
+                acc[cat] = (acc[cat] || 0) + 1
+                return acc
+              }, {})
+              const catColors = ['text-green-400 bg-green-500/10 border-green-500/20', 'text-blue-400 bg-blue-500/10 border-blue-500/20', 'text-purple-400 bg-purple-500/10 border-purple-500/20', 'text-orange-400 bg-orange-500/10 border-orange-500/20', 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20', 'text-pink-400 bg-pink-500/10 border-pink-500/20']
+
+              return (
+                <motion.div key="analytics" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-5">
+
+                  {/* Top KPI row */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <StatCard icon={Users} value={totalVols} label="Total Volunteers" color="green" />
+                    <StatCard icon={Target} value={fillRate} label="Avg. Fill Rate" color="blue" suffix="%" />
+                    <StatCard icon={CheckCircle} value={completed} label="Drives Completed" color="purple" />
+                    <StatCard icon={Users} value={totalVols * 8} label="People Helped" color="orange" />
                   </div>
-                  {drives.length === 0 ? (
-                    <p className="text-secondary text-sm text-center py-8">No drives to analyze yet</p>
-                  ) : (
-                    <div className="space-y-4">
-                      {drives.slice(0, 6).map((d, i) => {
-                        const pct = Math.min(((d.volunteersJoined || 0) / (d.estimatedVolunteers || 20)) * 100, 100)
-                        return (
-                          <div key={d.id} className="flex items-center gap-4">
-                            <span className="text-xs text-secondary w-36 truncate">{d.title}</span>
-                            <div className="flex-1 h-2 rounded-full" style={{ background: 'var(--border)' }}>
-                              <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${pct}%` }}
-                                transition={{ duration: 0.8, delay: i * 0.1 }}
-                                className={`h-full rounded-full ${pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-blue-500'}`}
-                              />
+
+                  {/* Charts row */}
+                  <div className="grid lg:grid-cols-2 gap-5">
+                    <div className="card p-6">
+                      <div className="flex items-center justify-between mb-5">
+                        <div>
+                          <h2 className="font-semibold text-primary">Monthly Drives</h2>
+                          <p className="text-xs text-secondary mt-0.5">Drives created per month</p>
+                        </div>
+                        <span className="text-xs text-green-400 bg-green-500/10 px-2.5 py-1 rounded-full border border-green-500/20">
+                          {allDrives.length} total
+                        </span>
+                      </div>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <BarChart data={displayChartData} barSize={24}>
+                          <XAxis dataKey="month" tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
+                          <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
+                          <Tooltip content={<TT />} />
+                          <Bar dataKey="drives" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="card p-6">
+                      <div className="flex items-center justify-between mb-5">
+                        <div>
+                          <h2 className="font-semibold text-primary">Volunteer Growth</h2>
+                          <p className="text-xs text-secondary mt-0.5">Cumulative participation trend</p>
+                        </div>
+                        <span className="text-xs text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/20 flex items-center gap-1">
+                          <TrendingUp size={10} /> Growing
+                        </span>
+                      </div>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <AreaChart data={displayChartData}>
+                          <defs>
+                            <linearGradient id="ga" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#818cf8" stopOpacity={0.3} />
+                              <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
+                            </linearGradient>
+                          </defs>
+                          <XAxis dataKey="month" tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
+                          <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickLine={false} />
+                          <Tooltip content={<TT />} />
+                          <Area type="monotone" dataKey="volunteers" stroke="#818cf8" strokeWidth={2} fill="url(#ga)" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Drive Fill Rate */}
+                  <div className="card p-6">
+                    <div className="flex items-center justify-between mb-5">
+                      <div>
+                        <h2 className="font-semibold text-primary">Drive Fill Rate</h2>
+                        <p className="text-xs text-secondary mt-0.5">Volunteer slots filled per drive</p>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs">
+                        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" />≥80%</span>
+                        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-yellow-500 inline-block" />50–79%</span>
+                        <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />&lt;50%</span>
+                      </div>
+                    </div>
+                    {allDrives.length === 0 ? (
+                      <p className="text-secondary text-sm text-center py-8">No drives to analyze yet</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {allDrives.slice(0, 6).map((d, i) => {
+                          const pct = Math.min(((d.volunteersJoined || 0) / (d.estimatedVolunteers || 20)) * 100, 100)
+                          return (
+                            <div key={d.id} className="flex items-center gap-4">
+                              <span className="text-xs text-secondary w-36 truncate">{d.title}</span>
+                              <div className="flex-1 h-2.5 rounded-full" style={{ background: 'var(--border)' }}>
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${pct}%` }}
+                                  transition={{ duration: 0.8, delay: i * 0.1 }}
+                                  className={`h-full rounded-full ${pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-blue-500'}`}
+                                />
+                              </div>
+                              <span className="text-xs text-secondary w-16 text-right">{d.volunteersJoined || 0}/{d.estimatedVolunteers || 20}</span>
+                              <span className={`text-xs font-bold w-10 text-right ${pct >= 80 ? 'text-green-400' : pct >= 50 ? 'text-yellow-400' : 'text-blue-400'}`}>
+                                {Math.round(pct)}%
+                              </span>
                             </div>
-                            <span className="text-xs text-secondary w-16 text-right">{d.volunteersJoined || 0}/{d.estimatedVolunteers || 20}</span>
-                            <span className={`text-xs font-semibold w-10 text-right ${pct >= 80 ? 'text-green-400' : pct >= 50 ? 'text-yellow-400' : 'text-blue-400'}`}>
-                              {Math.round(pct)}%
-                            </span>
-                          </div>
-                        )
-                      })}
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Top Performing Drives + Category Breakdown */}
+                  <div className="grid lg:grid-cols-2 gap-5">
+
+                    {/* Top Drives */}
+                    <div className="card p-6">
+                      <div className="flex items-center gap-2 mb-5">
+                        <TrendingUp size={15} className="text-green-400" />
+                        <h2 className="font-semibold text-primary">Top Performing Drives</h2>
+                      </div>
+                      {topDrives.length === 0 ? (
+                        <p className="text-secondary text-sm text-center py-8">No drives yet</p>
+                      ) : (                        <div className="space-y-3">
+                          {topDrives.map((d, i) => (
+                            <motion.div
+                              key={d.id}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: i * 0.07 }}
+                              className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer"
+                              onClick={() => setSelectedDrive(d)}
+                            >
+                              <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${
+                                i === 0 ? 'bg-yellow-500/20 text-yellow-400' :
+                                i === 1 ? 'bg-gray-400/20 text-gray-400' :
+                                i === 2 ? 'bg-orange-500/20 text-orange-400' :
+                                'bg-white/5 text-secondary'
+                              }`}>
+                                {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-primary truncate">{d.title}</p>
+                                <p className="text-xs text-secondary truncate">{d.location}</p>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <p className={`text-sm font-bold ${d.pct >= 80 ? 'text-green-400' : d.pct >= 50 ? 'text-yellow-400' : 'text-blue-400'}`}>
+                                  {Math.round(d.pct)}%
+                                </p>
+                                <p className="text-xs text-secondary">{d.volunteersJoined || 0} vols</p>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Category Breakdown */}
+                    <div className="card p-6">
+                      <div className="flex items-center gap-2 mb-5">
+                        <Globe size={15} className="text-purple-400" />
+                        <h2 className="font-semibold text-primary">Drives by Category</h2>
+                      </div>
+                      {allDrives.length === 0 ? (
+                        <p className="text-secondary text-sm text-center py-8">No drives yet</p>
+                      ) : (
+                        <div className="space-y-3">
+                          {Object.entries(catMap)
+                            .sort((a, b) => b[1] - a[1])
+                            .map(([cat, count], i) => {
+                              const pct = Math.round((count / drives.length) * 100)
+                              return (
+                                <div key={cat} className="space-y-1.5">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs text-secondary flex items-center gap-1.5">
+                                      <span>{catIcons[cat] || '🌍'}</span>
+                                      <span className="capitalize">{cat.replace('_', ' ')}</span>
+                                    </span>
+                                    <span className="text-xs font-semibold text-primary">{count} <span className="text-secondary font-normal">({pct}%)</span></span>
+                                  </div>
+                                  <div className="h-2 rounded-full" style={{ background: 'var(--border)' }}>
+                                    <motion.div
+                                      initial={{ width: 0 }}
+                                      animate={{ width: `${pct}%` }}
+                                      transition={{ duration: 0.7, delay: i * 0.08 }}
+                                      className={`h-full rounded-full ${catColors[i % catColors.length].split(' ')[0].replace('text', 'bg').replace('-400', '-500')}`}
+                                    />
+                                  </div>
+                                </div>
+                              )
+                            })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Verified Drives Impact Table */}
+                  {verifiedDrives.length > 0 && (
+                    <div className="card p-6">
+                      <div className="flex items-center gap-2 mb-5">
+                        <CheckCircle size={15} className="text-green-400" />
+                        <h2 className="font-semibold text-primary">Verified Impact Breakdown</h2>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/25 ml-auto">
+                          {verifiedDrives.length} drives
+                        </span>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                              {['Drive', 'Trees 🌳', 'Waste ♻️', 'Volunteers 👥', 'AI Score ⭐'].map(h => (
+                                <th key={h} className="text-left pb-3 text-secondary font-medium pr-4">{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {verifiedDrives.map((d, i) => (
+                              <motion.tr
+                                key={d.id}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: i * 0.05 }}
+                                className="hover:bg-white/3 transition-colors cursor-pointer"
+                                onClick={() => setSelectedDrive(d)}
+                                style={{ borderBottom: '1px solid var(--border)' }}
+                              >
+                                <td className="py-3 pr-4 font-medium text-primary max-w-[140px] truncate">{d.title}</td>
+                                <td className="py-3 pr-4 text-green-400 font-semibold">{d.verification.impact.treesPlanted || '—'}</td>
+                                <td className="py-3 pr-4 text-blue-400 font-semibold">{d.verification.impact.wasteCollected ? `${d.verification.impact.wasteCollected} kg` : '—'}</td>
+                                <td className="py-3 pr-4 text-purple-400 font-semibold">{d.verification.impact.volunteersAttended || '—'}</td>
+                                <td className="py-3">
+                                  {d.verification.aiResult?.impactScore ? (
+                                    <span className={`px-2 py-0.5 rounded-lg font-bold ${
+                                      d.verification.aiResult.impactScore >= 8 ? 'bg-green-500/15 text-green-400' :
+                                      d.verification.aiResult.impactScore >= 6 ? 'bg-yellow-500/15 text-yellow-400' :
+                                      'bg-red-500/15 text-red-400'
+                                    }`}>
+                                      {d.verification.aiResult.impactScore}/10
+                                    </span>
+                                  ) : '—'}
+                                </td>
+                              </motion.tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   )}
-                </div>
 
-                {/* Category breakdown */}
-                {drives.length > 0 && (
-                  <div className="card p-6">
-                    <h2 className="font-semibold text-primary mb-4">Drives by Category</h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {Object.entries(
-                        drives.reduce((acc, d) => {
-                          const cat = d.category || 'other'
-                          acc[cat] = (acc[cat] || 0) + 1
-                          return acc
-                        }, {})
-                      ).map(([cat, count]) => (
-                        <div key={cat} className="card p-4 text-center">
-                          <p className="text-2xl font-black text-primary">{count}</p>
-                          <p className="text-xs text-secondary capitalize mt-1">{cat.replace('_', ' ')}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            )}
+                </motion.div>
+              )
+            })()}
 
             {/* ── SETTINGS ── */}
             {activeSection === 'settings' && (

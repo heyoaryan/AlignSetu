@@ -25,36 +25,193 @@ const sidebarLinks = [
 ]
 
 const categoryData = [
-  { name: 'Cleanup', value: 35, color: '#60a5fa' },
-  { name: 'Plantation', value: 28, color: '#4ade80' },
-  { name: 'Awareness', value: 18, color: '#facc15' },
-  { name: 'Recycling', value: 12, color: '#c084fc' },
-  { name: 'Water', value: 7, color: '#22d3ee' },
+  { name: 'Food Drive', value: 28, color: '#f97316' },
+  { name: 'Health Camp', value: 22, color: '#f43f5e' },
+  { name: 'Awareness', value: 20, color: '#facc15' },
+  { name: 'Cleanup', value: 16, color: '#60a5fa' },
+  { name: 'Plantation', value: 10, color: '#4ade80' },
+  { name: 'Recycling', value: 4, color: '#c084fc' },
 ]
 
 const weeklyData = [
-  { day: 'Mon', drives: 4, volunteers: 28 },
-  { day: 'Tue', drives: 7, volunteers: 45 },
-  { day: 'Wed', drives: 5, volunteers: 32 },
-  { day: 'Thu', drives: 9, volunteers: 61 },
-  { day: 'Fri', drives: 12, volunteers: 78 },
-  { day: 'Sat', drives: 18, volunteers: 120 },
-  { day: 'Sun', drives: 14, volunteers: 95 },
+  { day: 'Mon', drives: 6, volunteers: 42 },
+  { day: 'Tue', drives: 9, volunteers: 67 },
+  { day: 'Wed', drives: 8, volunteers: 55 },
+  { day: 'Thu', drives: 13, volunteers: 88 },
+  { day: 'Fri', drives: 17, volunteers: 112 },
+  { day: 'Sat', drives: 24, volunteers: 165 },
+  { day: 'Sun', drives: 19, volunteers: 138 },
 ]
 
 const growthData = [
-  { month: 'Jan', users: 120, ngos: 8 },
-  { month: 'Feb', users: 280, ngos: 15 },
-  { month: 'Mar', users: 450, ngos: 22 },
-  { month: 'Apr', users: 620, ngos: 31 },
-  { month: 'May', users: 890, ngos: 42 },
-  { month: 'Jun', users: 1240, ngos: 58 },
+  { month: 'Jan', users: 180, ngos: 11 },
+  { month: 'Feb', users: 340, ngos: 19 },
+  { month: 'Mar', users: 580, ngos: 28 },
+  { month: 'Apr', users: 820, ngos: 39 },
+  { month: 'May', users: 1150, ngos: 54 },
+  { month: 'Jun', users: 1640, ngos: 72 },
 ]
 
 const flaggedMockNGOs = [
-  { id: 'f1', name: 'EcoFake Foundation', email: 'fake@ecofake.org', reason: 'Suspicious activity: 0 drives in 6 months', severity: 'high' },
-  { id: 'f2', name: 'Green Scam NGO', email: 'info@greenscam.org', reason: 'Duplicate registration detected', severity: 'critical' },
-  { id: 'f3', name: 'Nature Inactive', email: 'contact@natureinactive.org', reason: 'No volunteer engagement for 90 days', severity: 'medium' },
+  { id: 'f1', name: 'HealthFake Foundation', email: 'fake@healthfake.org', reason: 'Suspicious activity: 0 health camps in 6 months despite registration', severity: 'high' },
+  { id: 'f2', name: 'FoodAid Ghost NGO', email: 'info@foodaidghost.org', reason: 'Duplicate registration detected — same address as 2 other NGOs', severity: 'critical' },
+  { id: 'f3', name: 'Awareness Inactive Org', email: 'contact@awareinactive.org', reason: 'No volunteer engagement for 90 days, 0 drives completed', severity: 'medium' },
+]
+
+const MOCK_NGOS = [
+  { id: 'mock-ngo-p1', name: 'GreenHope Foundation', email: 'contact@greenhope.org', verified: false, createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), role: 'ngo' },
+  { id: 'mock-ngo-p2', name: 'NourishIndia Trust', email: 'admin@nourishindia.org', verified: false, createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), role: 'ngo' },
+  { id: 'mock-ngo-v1', name: 'EcoWarriors Delhi', email: 'info@ecowarriors.in', verified: true, createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), role: 'ngo' },
+  { id: 'mock-ngo-v2', name: 'HealthBridge NGO', email: 'team@healthbridge.org', verified: true, createdAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(), role: 'ngo' },
+  { id: 'mock-ngo-v3', name: 'AwareIndia Society', email: 'hello@awareindia.org', verified: true, createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(), role: 'ngo' },
+]
+
+// Rich mock drives for food, health, awareness — shown when Firebase is empty
+const MOCK_DRIVES = [
+  {
+    id: 'mock-1',
+    title: 'Community Food Distribution Drive',
+    category: 'food',
+    location: 'Connaught Place, New Delhi',
+    date: '2026-05-10',
+    duration: '4 hours',
+    urgency: 'high',
+    estimatedVolunteers: 30,
+    volunteersJoined: 22,
+    status: 'active',
+    description: 'Distributing nutritious meal packets to underprivileged families and homeless individuals around CP. Volunteers will help pack and distribute food.',
+    skills: ['Cooking', 'Driving', 'Social Media'],
+    ngoId: 'mock-ngo-1',
+    lat: 28.6315, lng: 77.2167,
+  },
+  {
+    id: 'mock-2',
+    title: 'Free Health Check-up Camp',
+    category: 'health',
+    location: 'Lajpat Nagar, New Delhi',
+    date: '2026-05-12',
+    duration: '6 hours',
+    urgency: 'critical',
+    estimatedVolunteers: 20,
+    volunteersJoined: 14,
+    status: 'active',
+    description: 'Free blood pressure, sugar, and general health screening for residents. Doctors and paramedics will be present. Volunteers needed for registration and crowd management.',
+    skills: ['First Aid', 'Medical', 'Data Entry'],
+    ngoId: 'mock-ngo-2',
+    lat: 28.5677, lng: 77.2433,
+  },
+  {
+    id: 'mock-3',
+    title: 'Mental Health Awareness Walk',
+    category: 'awareness',
+    location: 'India Gate Lawns, New Delhi',
+    date: '2026-05-15',
+    duration: '3 hours',
+    urgency: 'medium',
+    estimatedVolunteers: 50,
+    volunteersJoined: 38,
+    status: 'active',
+    description: 'A community walk to break the stigma around mental health. Participants carry placards, distribute pamphlets, and engage with the public.',
+    skills: ['Social Media', 'Photography', 'Teaching'],
+    ngoId: 'mock-ngo-1',
+    lat: 28.6129, lng: 77.2295,
+  },
+  {
+    id: 'mock-4',
+    title: 'Hunger-Free Weekend — Meal Drive',
+    category: 'food',
+    location: 'Nizamuddin Basti, New Delhi',
+    date: '2026-05-17',
+    duration: '5 hours',
+    urgency: 'high',
+    estimatedVolunteers: 25,
+    volunteersJoined: 18,
+    status: 'active',
+    description: 'Weekend meal drive serving hot cooked food to 500+ residents of Nizamuddin Basti. Volunteers help with cooking, serving, and clean-up.',
+    skills: ['Cooking', 'Waste Management'],
+    ngoId: 'mock-ngo-3',
+    lat: 28.5921, lng: 77.2461,
+  },
+  {
+    id: 'mock-5',
+    title: 'Eye Care & Vision Screening Camp',
+    category: 'health',
+    location: 'Rohini Sector 11, New Delhi',
+    date: '2026-05-20',
+    duration: '5 hours',
+    urgency: 'medium',
+    estimatedVolunteers: 15,
+    volunteersJoined: 9,
+    status: 'active',
+    description: 'Free eye check-up and spectacle distribution for school children and senior citizens. Ophthalmologists on-site. Volunteers assist with patient flow.',
+    skills: ['Medical', 'First Aid', 'Data Entry'],
+    ngoId: 'mock-ngo-2',
+    lat: 28.7041, lng: 77.1025,
+  },
+  {
+    id: 'mock-6',
+    title: 'Road Safety Awareness Campaign',
+    category: 'awareness',
+    location: 'Dwarka Sector 10, New Delhi',
+    date: '2026-05-22',
+    duration: '3 hours',
+    urgency: 'low',
+    estimatedVolunteers: 40,
+    volunteersJoined: 27,
+    status: 'active',
+    description: 'Educating commuters and school students about road safety rules, helmet usage, and pedestrian safety. Includes street play and poster distribution.',
+    skills: ['Teaching', 'Photography', 'Social Media'],
+    ngoId: 'mock-ngo-3',
+    lat: 28.5921, lng: 77.0460,
+  },
+  {
+    id: 'mock-7',
+    title: 'Ration Kit Distribution — Flood Relief',
+    category: 'food',
+    location: 'Yamuna Khadar, East Delhi',
+    date: '2026-05-25',
+    duration: '6 hours',
+    urgency: 'critical',
+    estimatedVolunteers: 35,
+    volunteersJoined: 29,
+    status: 'active',
+    description: 'Emergency ration kits (rice, dal, oil, biscuits) being distributed to flood-affected families near Yamuna banks. Urgent volunteers needed for loading and distribution.',
+    skills: ['Driving', 'Waste Management', 'Cooking'],
+    ngoId: 'mock-ngo-1',
+    lat: 28.6562, lng: 77.3210,
+  },
+  {
+    id: 'mock-8',
+    title: 'Dental Health Camp for Children',
+    category: 'health',
+    location: 'Govindpuri, South Delhi',
+    date: '2026-05-28',
+    duration: '4 hours',
+    urgency: 'medium',
+    estimatedVolunteers: 12,
+    volunteersJoined: 7,
+    status: 'active',
+    description: 'Free dental check-up and oral hygiene education for children aged 5–15. Dentists and dental students will conduct the camp. Volunteers manage queues and assist parents.',
+    skills: ['Medical', 'Teaching', 'First Aid'],
+    ngoId: 'mock-ngo-2',
+    lat: 28.5355, lng: 77.2590,
+  },
+  {
+    id: 'mock-9',
+    title: 'Digital Literacy Awareness Drive',
+    category: 'awareness',
+    location: 'Sangam Vihar, South Delhi',
+    date: '2026-06-01',
+    duration: '4 hours',
+    urgency: 'low',
+    estimatedVolunteers: 20,
+    volunteersJoined: 11,
+    status: 'active',
+    description: 'Teaching senior citizens and women about smartphone usage, UPI payments, and online safety. Volunteers with tech skills are especially welcome.',
+    skills: ['Teaching', 'Data Entry', 'Social Media'],
+    ngoId: 'mock-ngo-3',
+    lat: 28.5013, lng: 77.2590,
+  },
 ]
 
 function TT({ active, payload, label }) {
@@ -103,6 +260,11 @@ export default function AdminDashboard() {
   const verifiedNgos = ngos.filter(n => n.verified)
   const volunteers = users.filter(u => u.role === 'volunteer')
 
+  // Use mock NGOs when Firebase has no data (prototype mode)
+  const allNgos = ngos.length > 0 ? ngos : MOCK_NGOS
+  const effectivePendingNgos = ngos.length > 0 ? pendingNgos : MOCK_NGOS.filter(n => !n.verified)
+  const effectiveVerifiedNgos = ngos.length > 0 ? verifiedNgos : MOCK_NGOS.filter(n => n.verified)
+
   // AI: fetch platform insight once data is loaded
   useEffect(() => {
     if (!drives.length && !ngos.length) return
@@ -123,7 +285,9 @@ export default function AdminDashboard() {
   const filteredNgos = ngos.filter(n =>
     !ngoSearch || n.name?.toLowerCase().includes(ngoSearch.toLowerCase()) || n.email?.toLowerCase().includes(ngoSearch.toLowerCase())
   )
-  const drivesWithCoords = drives.map(d => ({
+  // Use mock drives when Firebase has no data (prototype mode)
+  const allDrives = drives.length > 0 ? drives : MOCK_DRIVES
+  const drivesWithCoords = allDrives.map(d => ({
     ...d,
     lat: d.lat || 28.6139 + (Math.random() - 0.5) * 0.22,
     lng: d.lng || 77.209 + (Math.random() - 0.5) * 0.22,
@@ -187,18 +351,18 @@ export default function AdminDashboard() {
             {activeSection === 'overview' && (
               <motion.div key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <StatCard icon={Users} value={users.length} label="Total Users" color="green" />
-                  <StatCard icon={Shield} value={verifiedNgos.length} label="Verified NGOs" color="blue" />
-                  <StatCard icon={Activity} value={drives.length} label="Total Drives" color="purple" />
-                  <StatCard icon={AlertTriangle} value={pendingNgos.length} label="Pending Verification" color="orange" />
+                  <StatCard icon={Users} value={users.length || 1640} label="Total Users" color="green" />
+                  <StatCard icon={Shield} value={effectiveVerifiedNgos.length || 72} label="Verified NGOs" color="blue" />
+                  <StatCard icon={Activity} value={allDrives.length} label="Total Drives" color="purple" />
+                  <StatCard icon={AlertTriangle} value={effectivePendingNgos.length} label="Pending Verification" color="orange" />
                 </div>
 
-                {pendingNgos.length > 0 && (
+                {effectivePendingNgos.length > 0 && (
                   <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
                     className="flex items-center gap-3 p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5 cursor-pointer"
                     onClick={() => setActiveSection('ngos')}>
                     <AlertTriangle size={16} className="text-yellow-400" />
-                    <span className="text-sm text-yellow-300">{pendingNgos.length} NGO{pendingNgos.length > 1 ? 's' : ''} awaiting verification</span>
+                    <span className="text-sm text-yellow-300">{effectivePendingNgos.length} NGO{effectivePendingNgos.length > 1 ? 's' : ''} awaiting verification</span>
                     <span className="ml-auto text-xs text-yellow-400 hover:text-yellow-300">Review →</span>
                   </motion.div>
                 )}
@@ -298,9 +462,9 @@ export default function AdminDashboard() {
                 {/* Quick stats */}
                 <div className="grid grid-cols-3 gap-4">
                   {[
-                    { label: 'Avg. Volunteers/Drive', value: drives.length ? Math.round(drives.reduce((s, d) => s + (d.volunteersJoined || 0), 0) / drives.length) : 0, icon: Users, color: 'text-green-400', bg: 'bg-green-500/10' },
-                    { label: 'Active Volunteers', value: volunteers.length, icon: Zap, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-                    { label: 'Verification Rate', value: `${ngos.length ? Math.round((verifiedNgos.length / ngos.length) * 100) : 0}%`, icon: Shield, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+                    { label: 'Avg. Volunteers/Drive', value: allDrives.length ? Math.round(allDrives.reduce((s, d) => s + (d.volunteersJoined || 0), 0) / allDrives.length) : 0, icon: Users, color: 'text-green-400', bg: 'bg-green-500/10' },
+                    { label: 'Active Volunteers', value: volunteers.length || 248, icon: Zap, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+                    { label: 'Verification Rate', value: `${allNgos.length ? Math.round((effectiveVerifiedNgos.length / allNgos.length) * 100) : 87}%`, icon: Shield, color: 'text-purple-400', bg: 'bg-purple-500/10' },
                   ].map(({ label, value, icon: Icon, color, bg }) => (
                     <div key={label} className="card p-5 flex items-center gap-4">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${bg} ${color}`}><Icon size={18} /></div>
@@ -324,13 +488,13 @@ export default function AdminDashboard() {
                     className="input-field w-full pl-10 pr-4 py-3 text-sm" />
                 </div>
 
-                {pendingNgos.length > 0 && (
+                {effectivePendingNgos.length > 0 && (
                   <div>
                     <h3 className="text-sm font-semibold text-primary mb-3 flex items-center gap-2">
-                      <AlertTriangle size={14} className="text-yellow-400" /> Pending ({pendingNgos.length})
+                      <AlertTriangle size={14} className="text-yellow-400" /> Pending ({effectivePendingNgos.length})
                     </h3>
                     <div className="space-y-3">
-                      {pendingNgos.filter(n => !ngoSearch || n.name?.toLowerCase().includes(ngoSearch.toLowerCase()) || n.email?.toLowerCase().includes(ngoSearch.toLowerCase())).map((ngo, i) => (
+                      {effectivePendingNgos.filter(n => !ngoSearch || n.name?.toLowerCase().includes(ngoSearch.toLowerCase()) || n.email?.toLowerCase().includes(ngoSearch.toLowerCase())).map((ngo, i) => (
                         <motion.div key={ngo.id} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.07 }}
                           className="card p-5 border-yellow-500/15 hover:border-yellow-500/30 transition-all">
                           <div className="flex items-center justify-between">
@@ -346,12 +510,12 @@ export default function AdminDashboard() {
                             </div>
                             <div className="flex gap-2">
                               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                                onClick={() => handleVerify(ngo.id, true)}
+                                onClick={() => ngos.length > 0 ? handleVerify(ngo.id, true) : toast.success('NGO verified! (prototype)')}
                                 className="flex items-center gap-1.5 px-4 py-2 bg-green-500/15 text-green-400 border border-green-500/25 rounded-xl text-sm hover:bg-green-500/25 transition-colors">
                                 <CheckCircle size={14} /> Verify
                               </motion.button>
                               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                                onClick={() => handleVerify(ngo.id, false)}
+                                onClick={() => ngos.length > 0 ? handleVerify(ngo.id, false) : toast.error('NGO rejected (prototype)')}
                                 className="flex items-center gap-1.5 px-4 py-2 bg-red-500/15 text-red-400 border border-red-500/25 rounded-xl text-sm hover:bg-red-500/25 transition-colors">
                                 <XCircle size={14} /> Reject
                               </motion.button>
@@ -363,7 +527,7 @@ export default function AdminDashboard() {
                   </div>
                 )}
 
-                {pendingNgos.length === 0 && (
+                {effectivePendingNgos.length === 0 && (
                   <div className="card p-14 text-center">
                     <div className="w-14 h-14 bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                       <CheckCircle size={24} className="text-green-400" />
@@ -373,13 +537,13 @@ export default function AdminDashboard() {
                   </div>
                 )}
 
-                {verifiedNgos.length > 0 && (
+                {effectiveVerifiedNgos.length > 0 && (
                   <div className="mt-6">
                     <h3 className="text-sm font-semibold text-primary mb-3 flex items-center gap-2">
-                      <CheckCircle size={14} className="text-green-400" /> Verified ({verifiedNgos.length})
+                      <CheckCircle size={14} className="text-green-400" /> Verified ({effectiveVerifiedNgos.length})
                     </h3>
                     <div className="grid md:grid-cols-2 gap-3">
-                      {filteredNgos.filter(n => n.verified).map(ngo => (
+                      {effectiveVerifiedNgos.filter(n => !ngoSearch || n.name?.toLowerCase().includes(ngoSearch.toLowerCase()) || n.email?.toLowerCase().includes(ngoSearch.toLowerCase())).map(ngo => (
                         <div key={ngo.id} className="card p-4 flex items-center gap-3">
                           <div className="w-9 h-9 bg-green-500/15 rounded-full flex items-center justify-center text-xs font-bold text-green-400">
                             {(ngo.name || ngo.email)?.[0]?.toUpperCase()}
@@ -485,10 +649,10 @@ export default function AdminDashboard() {
                   {/* Stats — change based on layer */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {(mapLayer === 'drives' ? [
-                      { label: 'Total Drives', value: drives.length, color: 'text-green-400', bg: 'bg-green-500/10' },
-                      { label: 'Active', value: drives.filter(d => d.status === 'active').length, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-                      { label: 'Completed', value: drives.filter(d => d.status === 'completed').length, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-                      { label: 'Volunteers Joined', value: drives.reduce((s, d) => s + (d.volunteersJoined || 0), 0), color: 'text-orange-400', bg: 'bg-orange-500/10' },
+                      { label: 'Total Drives', value: allDrives.length, color: 'text-green-400', bg: 'bg-green-500/10' },
+                      { label: 'Active', value: allDrives.filter(d => d.status === 'active').length, color: 'text-blue-400', bg: 'bg-blue-500/10' },
+                      { label: 'Completed', value: allDrives.filter(d => d.status === 'completed').length, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+                      { label: 'Volunteers Joined', value: allDrives.reduce((s, d) => s + (d.volunteersJoined || 0), 0), color: 'text-orange-400', bg: 'bg-orange-500/10' },
                     ] : [
                       { label: 'Total Volunteers', value: users.filter(u => u.role === 'volunteer').length, color: 'text-purple-400', bg: 'bg-purple-500/10' },
                       { label: 'Drives Joined', value: users.filter(u => u.role === 'volunteer').reduce((s, u) => s + (u.joinedDrives?.length || 0), 0), color: 'text-green-400', bg: 'bg-green-500/10' },
@@ -520,10 +684,10 @@ export default function AdminDashboard() {
             {activeSection === 'analytics' && (
               <motion.div key="analytics" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-5">
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <StatCard icon={Users} value={users.length} label="Total Users" color="green" />
-                  <StatCard icon={Globe} value={drives.length * 3} label="Cities Reached" color="blue" />
-                  <StatCard icon={TreePine} value={drives.length * 120} label="Trees Planted" color="purple" />
-                  <StatCard icon={Activity} value={drives.length * 4} label="Total Hours" color="orange" suffix="k" />
+                  <StatCard icon={Users} value={users.length || 1640} label="Total Users" color="green" />
+                  <StatCard icon={Globe} value={allDrives.length * 3} label="Cities Reached" color="blue" />
+                  <StatCard icon={TreePine} value={allDrives.length * 120} label="Trees Planted" color="purple" />
+                  <StatCard icon={Activity} value={allDrives.length * 4} label="Total Hours" color="orange" suffix="k" />
                 </div>
 
                 <div className="grid lg:grid-cols-2 gap-5">
@@ -711,9 +875,9 @@ export default function AdminDashboard() {
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
-                        { label: 'Total Users', value: users.length, color: 'text-green-400' },
-                        { label: 'Verified NGOs', value: ngos.filter(n => n.verified).length, color: 'text-blue-400' },
-                        { label: 'Active Drives', value: drives.filter(d => d.status === 'active').length, color: 'text-purple-400' },
+                        { label: 'Total Users', value: users.length || 1640, color: 'text-green-400' },
+                        { label: 'Verified NGOs', value: ngos.filter(n => n.verified).length || 72, color: 'text-blue-400' },
+                        { label: 'Active Drives', value: allDrives.filter(d => d.status === 'active').length, color: 'text-purple-400' },
                         { label: 'Pending', value: ngos.filter(n => !n.verified).length, color: 'text-orange-400' },
                       ].map(({ label, value, color }) => (
                         <div key={label} className="text-center p-4 rounded-xl" style={{ background: 'var(--input-bg)' }}>
