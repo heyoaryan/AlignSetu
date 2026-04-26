@@ -1,393 +1,215 @@
 <div align="center">
 
-<img src="public/leaf.svg" width="72" height="72" alt="AlignSetu Logo" />
+<img src="public/leaf.svg" width="64" height="64" alt="AlignSetu" />
 
 # AlignSetu
 
-### India's AI-Powered Environmental Volunteer Coordination Platform
+India's environmental volunteer coordination platform, built for the Google Solution Challenge 2026.
 
-**Built for Google Solution Challenge 2026**
-
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-alignsetu.web.app-4285F4?style=flat-square&logo=firebase)](https://alignsetu.web.app)
+[![Live](https://img.shields.io/badge/Live-alignsetu.web.app-4285F4?style=flat-square&logo=firebase)](https://alignsetu.web.app)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%2B%20Auth-FFCA28?style=flat-square&logo=firebase)](https://firebase.google.com)
-[![Gemini AI](https://img.shields.io/badge/Gemini-2.0%20Flash-4285F4?style=flat-square&logo=google)](https://ai.google.dev)
+[![Gemini](https://img.shields.io/badge/Gemini-2.0%20Flash-4285F4?style=flat-square&logo=google)](https://ai.google.dev)
 [![Google Maps](https://img.shields.io/badge/Google%20Maps-API-34A853?style=flat-square&logo=googlemaps)](https://developers.google.com/maps)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com)
-[![Deployed on Firebase](https://img.shields.io/badge/Deployed%20on-Google%20Cloud%20%2F%20Firebase%20Hosting-FF6F00?style=flat-square&logo=googlecloud)](https://alignsetu.web.app)
+[![Deployed on Google Cloud](https://img.shields.io/badge/Deployed%20on-Google%20Cloud-FF6F00?style=flat-square&logo=googlecloud)](https://alignsetu.web.app)
 
 </div>
 
 ---
 
-## 🌍 The Problem
+## What is this
 
-India has thousands of NGOs running environmental drives — cleanups, plantation campaigns, water conservation efforts, wildlife protection — but they operate in complete isolation.
+India has thousands of NGOs running cleanups, plantation drives, health camps, and awareness campaigns — but most of them work in silos. Volunteers don't know where to show up. Impact data never gets collected. Fake NGOs waste everyone's time. And local residents have no way to report issues to the people who can actually fix them.
 
-| Gap | Reality |
+AlignSetu (meaning "bridge of alignment") tries to fix that. It's a full-stack platform where NGOs post drives, volunteers find and join them, admins keep things accountable, and community members can report local issues by scanning a QR code. Gemini AI sits at the center of it — analyzing drives, matching volunteers, flagging bad actors, and generating insights.
+
+Live at **[alignsetu.web.app](https://alignsetu.web.app)** — deployed on Google Cloud via Firebase Hosting.
+
+---
+
+## The three roles
+
+**NGO** — Register, get verified by an admin, then start posting drives. You describe the drive in plain text and Gemini figures out the category, urgency, required skills, estimated volunteer count, and action items automatically. Once a drive is done, you submit photos and impact data through an 8-hour verification window and get an AI-generated impact report. You can also generate a QR code poster to put up in your area so locals can report issues directly to you.
+
+**Volunteer** — Sign up, build a profile with your skills and availability, and browse drives on a Google Map or list view. Gemini recommends the best drives for you based on your profile. Join drives to earn XP, build streaks, and unlock badges. After attending, check in with photos and notes and get a personalized thank-you from the AI.
+
+**Admin** — Verify NGO registrations, monitor platform stats, review AI-flagged suspicious NGOs, and get a one-sentence platform health insight from Gemini. There's a live map showing all active drives and volunteer locations.
+
+---
+
+## Features
+
+### Gemini AI (9 integrations)
+
+The whole AI layer lives in `src/services/gemini.js`. Here's what it does:
+
+- **Drive analysis** — takes a plain-text description and returns category, urgency level, required skills, estimated volunteers, duration, impact score out of 10, a two-sentence summary, and 3-5 action items
+- **Volunteer matching** — recommends the best drives for a volunteer based on their skills, location, availability, and volunteer type, with a match score and reason for each
+- **AI Volunteer Finder** — NGOs can type or speak a query and Gemini finds the best-fit volunteers for a specific drive, ranked with explanations
+- **Personalized nudges** — generates a motivating message for each volunteer based on their XP, streak, and recent activity
+- **Check-in thank you** — after a volunteer submits photos and notes, Gemini writes them a warm personalized thank-you
+- **Community needs report** — analyzes all active drives on the platform and surfaces the biggest local needs and a recommended action
+- **Admin platform insight** — gives admins a health summary, an alert if something looks off, and a recommendation
+- **NGO flagging** — identifies suspicious or inactive NGOs automatically for admin review
+- **Photo vision analysis** — when someone submits a photo through the public QR intake form, Gemini analyzes it to assess urgency and match it to existing drives
+
+### Google Maps
+
+Every active drive shows up as a color-coded marker on the map, grouped by category. Volunteers can turn on GPS to see drives within a radius they set (20 to 50 km). There are category filter toggles, info windows with drive details, and a one-tap button to open Google Maps directions. The admin map has two layers — drives and volunteer locations. Dark mode switches the map style automatically.
+
+### Public QR Intake
+
+NGOs can generate a branded poster with a QR code embedded. Anyone who scans it lands on a bilingual (Hindi and English) intake page where they can report an environmental issue. They can describe the problem by typing or speaking, attach a photo, share their GPS location, and set an urgency level. There's also a call mode if they'd rather just phone the NGO directly. Submitted reports show up in the NGO's Public Needs panel, where the NGO can review them, update their status, and see the AI's analysis of the photo and suggested matching drives.
+
+### Gamification
+
+Volunteers earn 50 XP every time they join a drive and a 25 XP bonus for maintaining a streak. There are six badges to unlock:
+
+- Tree Planter (join 3 plantation drives)
+- Eco Warrior (join 5 drives)
+- Skill Master (add 5 or more skills to your profile)
+- On Fire (3-day streak)
+- Champion (reach 500 XP)
+- Top Volunteer (join 10 drives)
+
+Each badge shows a progress bar so you know how close you are.
+
+### Dashboards
+
+The NGO dashboard has sections for overview stats, drive management, post-drive verification, public needs, AI Finder, analytics, and settings. The volunteer dashboard covers overview, map view, drive browsing, drive history, and profile. The admin dashboard has overview, NGO verification, flagged NGOs, live map, analytics, and settings. All three update in real time via Firestore listeners.
+
+### Auth
+
+Firebase Auth handles email/password login and Google OAuth. There are three roles — ngo, volunteer, admin — and each one gets routed to its own dashboard. NGOs can't go live until an admin verifies them. Sessions persist across reloads.
+
+### UI
+
+Dark and light mode with smooth transitions, stored in localStorage. Framer Motion animations on page transitions, card hovers, and stat counters. Animated typing effect on the landing hero. Scroll-based parallax on the hero section. Floating particles in the background. The whole interface is bilingual — Hindi and English side by side in forms and labels. Voice input works in both languages. Fully responsive on mobile, tablet, and desktop.
+
+---
+
+## Tech stack
+
+| | |
 |---|---|
-| 🔴 **No central platform** | NGOs coordinate via WhatsApp groups, spreadsheets, and emails |
-| 🔴 **Volunteers go unmatched** | Willing volunteers have no way to discover nearby drives that fit their skills |
-| 🔴 **Data is scattered** | Impact data is never aggregated — trees planted, waste cleared, hours contributed |
-| 🔴 **No trust layer** | Fake or inactive NGOs waste volunteer time with zero accountability |
-| 🔴 **Manual planning** | NGOs spend hours manually structuring drives, estimating volunteers, and assigning tasks |
-| 🔴 **Community voice ignored** | Local residents have no easy way to report environmental issues to NGOs |
-
-The result: environmental intent exists, but action is fragmented and unmeasured.
-
----
-
-## ✅ The Solution — AlignSetu
-
-AlignSetu (meaning *"bridge of alignment"*) is a full-stack web platform that connects NGOs, volunteers, administrators, and local communities on one AI-powered system.
-
-**Gemini AI** reads drive descriptions and converts them into structured action plans. **Google Maps** shows volunteers exactly where help is needed. **Firebase** keeps everything in sync in real time. Every drive, every volunteer hour, every outcome is tracked and measured.
-
-> One platform. Three roles. Real environmental impact.
-
-🔗 **Live at:** [https://alignsetu.web.app](https://alignsetu.web.app) — Deployed on **Google Cloud (Firebase Hosting)**
+| Frontend | React 19 + Vite 8 |
+| Styling | Tailwind CSS v4 |
+| Animations | Framer Motion |
+| Auth and database | Firebase Auth + Firestore |
+| AI | Google Gemini 2.0 Flash |
+| Maps | Google Maps API |
+| Charts | Recharts |
+| Icons | Lucide React |
+| Notifications | React Hot Toast |
+| Routing | React Router v7 |
+| Hosting | Firebase Hosting on Google Cloud |
 
 ---
 
-## 🚀 How It Works
+## SDGs addressed
 
-### For NGOs
-```
-1. Register & get verified by admin
-2. Describe your drive in plain text
-3. Gemini AI auto-generates: category, urgency score, required skills,
-   estimated volunteers, duration, action items, impact score
-4. Drive goes live on the map instantly
-5. Generate a QR code poster for community intake
-6. After the drive: upload photos + impact data → AI verifies and generates report
-```
+- SDG 13 (Climate Action) — coordinates drives that reduce pollution and restore ecosystems
+- SDG 15 (Life on Land) — supports plantation, wildlife protection, and land restoration
+- SDG 6 (Clean Water) — enables water conservation and river restoration campaigns
+- SDG 17 (Partnerships for the Goals) — connects NGOs, volunteers, and communities on one platform
 
-### For Volunteers
-```
-1. Sign up and build a profile (skills, availability, location, volunteer type)
-2. Browse drives on an interactive Google Map or list view
-3. Gemini AI recommends the best-fit drives based on your profile
-4. Join a drive → earn XP, build streaks, unlock badges
-5. Check in at the drive → submit photos + notes → get AI-generated thank-you
-```
+---
 
-### For Admins
-```
-1. Review and verify NGO registrations
-2. Monitor platform-wide stats: drives, volunteers, completion rates
-3. AI flags suspicious/inactive NGOs automatically
-4. View live activity map (drives layer + volunteers layer)
-5. Get Gemini AI platform health insights and recommendations
-```
+## Project structure
 
-### For the Community (Public)
 ```
-1. Scan a QR code posted by an NGO in your area
-2. Report an environmental issue via form or voice (Hindi/English)
-3. Upload a photo — AI analyzes urgency and matches to existing drives
-4. Or call the NGO directly from the intake page
+src
+  components
+    AIFinder.jsx              voice and text volunteer search powered by Gemini
+    AIResultPanel.jsx         shows the AI analysis after a drive is described
+    CreateDriveModal.jsx      3-step drive creation flow with AI analysis built in
+    DriveCard.jsx             drive summary card with countdown and volunteer progress
+    DriveDetailModal.jsx      full drive view with Details, Updates, and Map tabs
+    DriveVerificationModal.jsx  post-drive photo upload and impact submission
+    MapView.jsx               Google Maps with markers, filters, and radius circle
+    Navbar.jsx                landing page nav with theme toggle
+    PublicNeedsPanel.jsx      NGO panel for managing QR intake submissions
+    QRIntakeModal.jsx         QR poster generator with download and share
+    Sidebar.jsx               dashboard sidebar for all three roles
+    StatCard.jsx              animated stat counter card
+    VolunteerCheckInModal.jsx  check-in with photos, notes, rating, and AI thank-you
+  config
+    firebase.js               Firebase setup and mock Firestore for demo mode
+  context
+    AuthContext.jsx           auth state and role management
+    ThemeContext.jsx          dark/light theme with localStorage
+  pages
+    Landing.jsx               public landing page
+    Auth.jsx                  login and signup with role selection
+    NGODashboard.jsx          full NGO dashboard
+    VolunteerDashboard.jsx    full volunteer dashboard
+    AdminDashboard.jsx        full admin dashboard
+    PublicIntake.jsx          QR intake form for community members
+  services
+    gemini.js                 all 9 Gemini API calls
+  App.jsx                     routes and protected route logic
+  main.jsx                    entry point
 ```
 
 ---
 
-## ✨ Key Features
+## Running locally
 
-### 🤖 Gemini AI — Core Intelligence Layer (9 AI Features)
-
-| Feature | What it does |
-|---|---|
-| **Drive Analysis** | Converts plain-text drive description into structured data: category, urgency, required skills, estimated volunteers, duration, impact score (1–10), summary, and action items |
-| **Volunteer Matching** | Recommends top drives for each volunteer based on skills, location, availability, and volunteer type — with match score and reason |
-| **AI Volunteer Finder** | NGOs can search for best-fit volunteers for a specific drive using voice or text — Gemini ranks and explains matches |
-| **Personalized Nudges** | Generates motivating messages for volunteers based on their XP, streak, and activity history |
-| **Check-in Thank You** | Creates a warm, personalized thank-you after a volunteer submits photos and notes |
-| **Community Needs Report** | Analyzes all active drives to surface the biggest local environmental needs, urgent areas, and a recommended action |
-| **Admin Platform Insight** | Gives admins a health summary, alert, and recommendation based on live platform stats |
-| **NGO Flagging** | AI identifies suspicious or inactive NGOs for admin review |
-| **Photo Vision Analysis** | Analyzes photos submitted via public QR intake to assess urgency and match to existing drives |
-
----
-
-### 🗺️ Google Maps Integration
-
-- Interactive map showing all active drives as color-coded markers by category
-- Volunteer GPS location detection with adjustable radius filter (20–50 km)
-- Category filter chips to show only relevant drive types
-- Admin live map with two layers: NGO drives and volunteer locations
-- Drive info windows with one-tap Google Maps directions
-- Reverse geocoding for human-readable location names
-- Dark map style in dark mode
-
----
-
-### 📋 Public QR Intake System
-
-- NGOs generate a branded QR code poster (bilingual — Hindi & English)
-- Community members scan the QR to report environmental issues
-- **Form mode**: category selector, voice/text description, GPS location, urgency level, photo upload
-- **Call mode**: direct phone call to NGO with SMS follow-up option
-- AI Vision analyzes submitted photos and auto-adjusts urgency
-- Submitted needs appear in the NGO's Public Needs panel for action
-- Poster download with NGO branding, QR code, and helpline number
-
----
-
-### 🎮 Gamification System
-
-- **XP System**: Earn 50 XP per drive joined, 25 XP streak bonus
-- **Daily Streak Tracking**: Consecutive day activity tracking
-- **6 Unlockable Badges** with progress bars:
-  - 🌳 Tree Planter — Join 3+ plantation drives
-  - 🏆 Eco Warrior — Join 5+ drives
-  - 🎯 Skill Master — List 5+ skills
-  - 🔥 On Fire — Maintain a 3-day streak
-  - 👑 Champion — Earn 500+ XP
-  - ⭐ Top Volunteer — Join 10+ drives
-
----
-
-### 📊 Real-time Dashboards
-
-**NGO Dashboard**
-- Stats: Total Drives, People Helped, Volunteers Joined, Completed Drives
-- Volunteer engagement area chart (monthly trend)
-- Impact metrics: Trees Planted, Waste Collected, Area Covered, Lives Impacted
-- Drive management with search + filter (all / active / completed)
-- 8-hour post-drive verification window with photo submission
-- AI Finder to match volunteers to a specific drive
-- Public Needs panel with QR intake management
-- Analytics: weekly activity, category breakdown, growth trends
-
-**Volunteer Dashboard**
-- Stats: Drives Joined, Hours Contributed, XP, Current Streak
-- AI nudge card with personalized motivation
-- Profile builder: skills (14 options), volunteer type (7 types), availability (6 options), location, bio
-- Gamification: XP system, streak tracking, 6 unlockable badges
-- AI-recommended drives with match scores
-- Map view with radius and category filters
-- My Drives history with full detail modal
-- Check-in modal: photo upload (up to 5), notes, star rating → AI thank-you message
-
-**Admin Dashboard**
-- Stats: Total Users, Verified NGOs, Total Drives, Pending Verifications
-- Alert banner for pending NGO verifications
-- AI Platform Insight: health summary, alerts, recommendations
-- Weekly activity bar chart (drives + volunteers per day)
-- Drive category pie chart
-- Platform growth line chart (users + NGOs over 6 months)
-- NGO verification queue: approve or reject with one click
-- Flagged NGOs panel with severity levels (low / medium / high / critical)
-- Live activity map with drives and volunteers layers
-
----
-
-### 🔐 Authentication & Role System
-
-- Firebase Auth with email/password
-- Google OAuth (social login)
-- Three roles: `ngo`, `volunteer`, `admin`
-- Protected routes — each role sees only their dashboard
-- NGOs require admin verification before going live
-- Session persistence across page reloads
-
----
-
-### 🎨 UI & Experience
-
-- Full dark / light theme with smooth transitions and localStorage persistence
-- Framer Motion animations throughout (page transitions, card hovers, animated counters)
-- Animated typing effect on the landing hero
-- Scroll-based parallax and fade on the hero section
-- Floating particle animations on landing
-- Bilingual interface (Hindi + English) throughout
-- Voice input support for accessibility (Hindi/English language selection)
-- Responsive layout — works on mobile, tablet, and desktop
-- React Hot Toast notifications for all actions
-- Animated stat counters with IntersectionObserver
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology | Purpose |
-|---|---|---|
-| Frontend | React 19 + Vite 8 | UI framework and build tool |
-| Styling | Tailwind CSS v4 | Utility-first styling |
-| Animations | Framer Motion | Page transitions, micro-interactions |
-| Auth & Database | Firebase Auth + Firestore | User auth and real-time data |
-| AI | Google Gemini 2.0 Flash | Drive analysis, matching, insights, vision |
-| Maps | Google Maps API | Interactive drive discovery map |
-| Charts | Recharts | Analytics dashboards |
-| Icons | Lucide React | Consistent icon system |
-| Notifications | React Hot Toast | In-app feedback |
-| Routing | React Router v7 | Client-side navigation |
-| Hosting | Firebase Hosting (Google Cloud) | Production deployment |
-
----
-
-## 🌱 UN Sustainable Development Goals
-
-AlignSetu directly addresses:
-
-- **SDG 13 — Climate Action**: Coordinates environmental drives that reduce pollution and restore ecosystems
-- **SDG 15 — Life on Land**: Supports plantation, wildlife protection, and land restoration drives
-- **SDG 6 — Clean Water**: Enables water conservation and lake/river restoration campaigns
-- **SDG 17 — Partnerships for the Goals**: Bridges NGOs, volunteers, and communities on one platform
-
----
-
-## 📁 Project Structure
-
-```
-src/
-├── components/
-│   ├── AIFinder.jsx              # Gemini-powered volunteer finder for NGOs (voice + text)
-│   ├── AIResultPanel.jsx         # Displays AI drive analysis results
-│   ├── CreateDriveModal.jsx      # 3-step drive creation with AI analysis
-│   ├── DriveCard.jsx             # Drive summary card with countdown timer
-│   ├── DriveDetailModal.jsx      # Full drive detail with tabs (Details, Updates, Map)
-│   ├── DriveVerificationModal.jsx # 8-hour post-drive verification with photo upload
-│   ├── MapView.jsx               # Google Maps component with markers and filters
-│   ├── Navbar.jsx                # Landing page navigation with theme toggle
-│   ├── PublicNeedsPanel.jsx      # QR intake management panel for NGOs
-│   ├── QRIntakeModal.jsx         # QR code poster generator and downloader
-│   ├── Sidebar.jsx               # Dashboard sidebar (all roles) with mobile drawer
-│   ├── StatCard.jsx              # Reusable animated stat display card
-│   └── VolunteerCheckInModal.jsx # Check-in with photo upload + AI thank-you
-│
-├── config/
-│   └── firebase.js               # Firebase init + mock Firestore for demo
-│
-├── context/
-│   ├── AuthContext.jsx           # Auth state, user role management
-│   └── ThemeContext.jsx          # Dark/light theme state with persistence
-│
-├── pages/
-│   ├── Landing.jsx               # Public landing page with animations
-│   ├── Auth.jsx                  # Login / signup with role selection + Google OAuth
-│   ├── NGODashboard.jsx          # NGO role dashboard (7 sections)
-│   ├── VolunteerDashboard.jsx    # Volunteer role dashboard (5 sections)
-│   ├── AdminDashboard.jsx        # Admin role dashboard (6 sections)
-│   └── PublicIntake.jsx          # QR-based public community intake form
-│
-├── services/
-│   └── gemini.js                 # All Gemini AI API calls (9 functions)
-│
-├── App.jsx                       # Routes + protected route logic
-└── main.jsx                      # App entry point
-```
-
----
-
-## ⚡ Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- A Google account for Firebase and API keys
-
-### 1. Clone the repo
+You need Node 18 or higher.
 
 ```bash
 git clone https://github.com/heyoaryan/AlignSetu.git
 cd AlignSetu
-```
-
-### 2. Install dependencies
-
-```bash
 npm install
-```
-
-### 3. Set up environment variables
-
-```bash
 cp .env.example .env
 ```
 
-Fill in your keys in `.env`:
+Fill in `.env` with your keys:
 
-```env
-VITE_FIREBASE_API_KEY=your_firebase_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-VITE_GOOGLE_MAPS_API_KEY=your_maps_api_key
-VITE_GEMINI_API_KEY=your_gemini_api_key
+```
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_GOOGLE_MAPS_API_KEY=
+VITE_GEMINI_API_KEY=
 ```
 
-> **Note:** The app ships with a full mock Firestore implementation. You can run and demo all features without a real Firebase project — just leave the Firebase keys as-is and the mock data will load automatically.
-
-### 4. Run the dev server
+The app has a full mock Firestore implementation so you can run it without real Firebase keys. Mock drives load automatically on first visit.
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173)
-
-### 5. Try the demo
-
-The app seeds real drives on first load (Yamuna River Cleanup, Lodhi Garden Plantation, Community Food Drive, Free Health Camp, and more). Sign up with any email and select a role to explore each dashboard.
-
-| Role | What to try |
-|---|---|
-| **Volunteer** | Browse drives on the map, join a drive, earn XP, check in with photos, unlock badges |
-| **NGO** | Create a drive (watch Gemini analyze it), generate a QR poster, verify a completed drive, use AI Finder |
-| **Admin** | Verify an NGO, view the live map, read the AI platform insight, review flagged NGOs |
-| **Public** | Visit `/intake/:ngoId` to try the community QR intake form with voice input |
+Opens at http://localhost:5173. Sign up with any email and pick a role to explore. There are pre-seeded drives (Yamuna River Cleanup, Lodhi Garden Plantation, Community Food Drive, Free Health Camp) so the map and dashboards aren't empty.
 
 ---
 
-## 🏗️ Build & Deploy
-
-### Build for Production
+## Deploying
 
 ```bash
 npm run build
-```
-
-Output goes to `dist/`.
-
-### Deploy to Firebase Hosting (Google Cloud)
-
-```bash
 npm install -g firebase-tools
 firebase login
 firebase deploy
 ```
 
-Live at: **[https://alignsetu.web.app](https://alignsetu.web.app)**
+---
+
+## What's next
+
+- Push notifications for drive reminders
+- NGO public profile pages
+- Volunteer leaderboard by city
+- Calendar integration for drive scheduling
+- WhatsApp bot for updates
+- Hindi, Tamil, Bengali language support
+- Carbon offset calculator
+- PWA with offline support
 
 ---
 
-## 🗺️ Roadmap
-
-- [ ] Push notifications for drive reminders
-- [ ] NGO profile pages with public drive history
-- [ ] Volunteer leaderboard by city/region
-- [ ] Drive scheduling with calendar integration
-- [ ] WhatsApp bot for drive updates
-- [ ] Multi-language support (Hindi, Tamil, Bengali)
-- [ ] Carbon offset calculator per drive
-- [ ] Offline support with PWA
-
----
-
-## 👤 Team
-
-Built with ❤️ for **Google Solution Challenge 2026**
-
-**Aryan Singh Thakur** — [github.com/heyoaryan](https://github.com/heyoaryan)
-
----
-
-<div align="center">
-
-*AlignSetu — Bridging the gap between environmental intent and real-world action.*
-
-🌐 **[alignsetu.web.app](https://alignsetu.web.app)**
-
-</div>
+Built by **Aryan Singh Thakur** for Google Solution Challenge 2026.  
+[github.com/heyoaryan](https://github.com/heyoaryan) · [alignsetu.web.app](https://alignsetu.web.app)
