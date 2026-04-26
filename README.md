@@ -19,9 +19,9 @@ India's environmental volunteer coordination platform, built for the Google Solu
 
 ## What is this
 
-India has thousands of NGOs running cleanups, plantation drives, health camps, and awareness campaigns — but most of them work in silos. Volunteers don't know where to show up. Impact data never gets collected. Fake NGOs waste everyone's time. And local residents have no way to report issues to the people who can actually fix them.
+India has thousands of NGOs running cleanups, plantation drives, health camps, and awareness campaigns but most of them work in silos. Volunteers don't know where to show up. Impact data never gets collected. Fake NGOs waste everyone's time. And local residents have no way to report issues to the people who can actually fix them.
 
-AlignSetu (meaning "bridge of alignment") tries to fix that. It's a full-stack platform where NGOs post drives, volunteers find and join them, admins keep things accountable, and community members can report local issues by scanning a QR code. Gemini AI sits at the center of it — analyzing drives, matching volunteers, flagging bad actors, and generating insights.
+AlignSetu (meaning "bridge of alignment") tries to fix that. It's a full-stack platform where NGOs post drives, volunteers find and join them, admins keep things accountable, and community members can report local issues by scanning a QR code. Gemini AI sits at the center of it  analyzing drives, matching volunteers, flagging bad actors, and generating insights.
 
 Live at **[alignsetu.web.app](https://alignsetu.web.app)** — deployed on Google Cloud via Firebase Hosting.
 
@@ -29,9 +29,9 @@ Live at **[alignsetu.web.app](https://alignsetu.web.app)** — deployed on Googl
 
 ## The three roles
 
-**NGO** — Register, get verified by an admin, then start posting drives. You describe the drive in plain text and Gemini figures out the category, urgency, required skills, estimated volunteer count, and action items automatically. Once a drive is done, you submit photos and impact data through an 8-hour verification window and get an AI-generated impact report. You can also generate a QR code poster to put up in your area so locals can report issues directly to you.
+**NGO** — Register, get verified by an admin, then start posting drives. You describe the drive in plain text and Gemini figures out the category, urgency, required skills, estimated volunteer count, and action items automatically. Once a drive is done, you submit photos and impact data through an 8 hour verification window and get an AI-generated impact report. You can also generate a QR code poster to put up in your area so locals can report issues directly to you.
 
-**Volunteer** — Sign up, build a profile with your skills and availability, and browse drives on a Google Map or list view. Gemini recommends the best drives for you based on your profile. Join drives to earn XP, build streaks, and unlock badges. After attending, check in with photos and notes and get a personalized thank-you from the AI.
+**Volunteer** — Sign up, build a profile with your skills and availability, and browse drives on a Google Map or list view. Gemini recommends the best drives for you based on your profile. Join drives to earn XP, build streaks, and unlock badges. After attending, check in with photos and notes and get a personalized thank you from the AI.
 
 **Admin** — Verify NGO registrations, monitor platform stats, review AI-flagged suspicious NGOs, and get a one-sentence platform health insight from Gemini. There's a live map showing all active drives and volunteer locations.
 
@@ -45,7 +45,7 @@ The whole AI layer lives in `src/services/gemini.js`. Here's what it does:
 
 - **Drive analysis** — takes a plain-text description and returns category, urgency level, required skills, estimated volunteers, duration, impact score out of 10, a two-sentence summary, and 3-5 action items
 - **Volunteer matching** — recommends the best drives for a volunteer based on their skills, location, availability, and volunteer type, with a match score and reason for each
-- **AI Volunteer Finder** — NGOs can type or speak a query and Gemini finds the best-fit volunteers for a specific drive, ranked with explanations
+- **AI Volunteer Finder** — NGOs can type or speak a query and Gemini finds the best fit volunteers for a specific drive, ranked with explanations
 - **Personalized nudges** — generates a motivating message for each volunteer based on their XP, streak, and recent activity
 - **Check-in thank you** — after a volunteer submits photos and notes, Gemini writes them a warm personalized thank-you
 - **Community needs report** — analyzes all active drives on the platform and surfaces the biggest local needs and a recommended action
@@ -55,7 +55,7 @@ The whole AI layer lives in `src/services/gemini.js`. Here's what it does:
 
 ### Google Maps
 
-Every active drive shows up as a color-coded marker on the map, grouped by category. Volunteers can turn on GPS to see drives within a radius they set (20 to 50 km). There are category filter toggles, info windows with drive details, and a one-tap button to open Google Maps directions. The admin map has two layers — drives and volunteer locations. Dark mode switches the map style automatically.
+Every active drive shows up as a color-coded marker on the map, grouped by category. Volunteers can turn on GPS to see drives within a radius they set (20 to 50 km). There are category filter toggles, info windows with drive details, and a one-tap button to open Google Maps directions. The admin map has two layers drives and volunteer locations. Dark mode switches the map style automatically.
 
 ### Public QR Intake
 
@@ -80,7 +80,7 @@ The NGO dashboard has sections for overview stats, drive management, post-drive 
 
 ### Auth
 
-Firebase Auth handles email/password login and Google OAuth. There are three roles — ngo, volunteer, admin — and each one gets routed to its own dashboard. NGOs can't go live until an admin verifies them. Sessions persist across reloads.
+Firebase Auth handles email/password login and Google OAuth. There are three roles ngo, volunteer, admin and each one gets routed to its own dashboard. NGOs can't go live until an admin verifies them. Sessions persist across reloads.
 
 ### UI
 
